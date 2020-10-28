@@ -1,0 +1,20 @@
+# -*- mode: snippet -*-
+# name: <nsbusage
+# key: <nsbusage
+# --
+#+name: ${1:enumerate}-usage
+#+begin_src bash
+$1_usage(){
+cat <<'EOF'
+Example:
+
+    <<$1-ex>>
+
+Results:
+
+    <<$1-ex()>>
+
+EOF
+}
+#+end_src
+$0

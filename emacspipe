@@ -1,0 +1,2 @@
+#!/run/current-system/profile/bin/bash
+TERM="xterm" emacs -nw --insert <(cat) </dev/tty

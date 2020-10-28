@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: <i
+# key: <i
+# --
+#+begin_info
+$0
+#+end_info

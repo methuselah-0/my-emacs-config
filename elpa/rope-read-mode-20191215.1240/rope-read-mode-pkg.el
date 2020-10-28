@@ -1,0 +1,2 @@
+;;; Generated package description from /home/user1/.emacs.d/elpa/rope-read-mode-20191215.1240/rope-read-mode.el  -*- no-byte-compile: t -*-
+(define-package "rope-read-mode" "20191215.1240" "Rearrange lines to read text smoothly" '((emacs "24")) :commit "d1246557e2c9c685b0ee4ec0e58237431b846096" :keywords '("reading" "convenience" "chill") :authors '(("Marco Wahl" . "marcowahlsoft@gmail.com")) :maintainer '("Marco Wahl" . "marcowahlsoft@gmail.com") :url "https://github.com/marcowahl/rope-read-mode")

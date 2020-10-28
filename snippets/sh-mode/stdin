@@ -1,0 +1,28 @@
+# -*- mode: snippet -*-
+# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil))
+# name: stdin
+# key: stdin
+# --
+[[ "\$1" =~ (-h|--help) ]] && return 0
+local z
+local null=(z null "" "Read null-separated input from stdin" 0)
+Options+=("(\${null[*]@Q})")
+local -a Operands
+setopts "\$@"
+[[ "\$1" =~ (-h|--help) ]] && return 0
+local -a Input
+if [[ ! -t 0 ]]; then    	  
+    if [[ -n "\$z" ]]; then
+        mapfile -t -d '' Input
+    else
+        mapfile -t Input; fi
+else
+	Input=("\${Operands[@]}"); fi
+    # local -i i
+    # for ((i=1;i<=\$#;i++)); do
+    #     eval "narg=\\\"\\\${$i}\\\""
+    #     if [[ "\${narg}" == '--' ]]; then
+    # 	    i+=1 && Input=("\${@:$i}"); fi; done; fi
+
+[[ ! -n "\${Input[*]}" ]] && { stack "\$@" && return 1 ; }	    
+$0

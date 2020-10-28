@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: checkscm
+# key: checkscm
+# --
+if ! command -v scm &>/dev/null; then
+   enable -f ~/.guix-profile/lib/bash/libguile-bash.so scm &>/dev/null || { printf '%s' "Enabling guile-bash failed: \${_STACK}" && stack "\$@" && return 1; }; fi
+$0

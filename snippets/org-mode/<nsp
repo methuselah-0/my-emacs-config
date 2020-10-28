@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: <nsp
+# key: <nsp
+# --
+#+BEGIN_SRC python :noweb-ref $1
+$0
+#+END_SRC

@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: fdie
+# key: fdie
+# --
+|| { printf '%s' "${1:error_msg}: \${_STACK}" && bcu__stack "\$@" && return 1; }
+$0

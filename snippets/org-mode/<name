@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: <namei
+# key: <namei
+# --
+#+name: $0-info

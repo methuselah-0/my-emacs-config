@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: <lt
+# key: <lt
+# --
+#+NAME: $1
+#+CAPTION: "$2"
+#+ATTR_HTML: :class left-table
+$0

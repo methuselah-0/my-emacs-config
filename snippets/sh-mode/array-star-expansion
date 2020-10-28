@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: aes
+# key: aes
+# --
+"\${$1[*]}"$0

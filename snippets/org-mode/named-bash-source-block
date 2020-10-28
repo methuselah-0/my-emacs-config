@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: <nsb
+# key: <nsb
+# --
+#+name: $0
+#+begin_src bash :session test
+
+#+end_src

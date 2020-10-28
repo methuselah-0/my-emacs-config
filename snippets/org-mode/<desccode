@@ -1,0 +1,18 @@
+# -*- mode: snippet -*-
+# expand-env: ((yas-after-exit-snippet-hook #'org-align-all-tags) (yas-indent-line 'fixed) (yas-wrap-around-region 'nil))
+# name: <desccode
+# key: <desccode
+# --
+      local _DESCRIPTION _EXAMPLE z
+      [[ "$1" =~ (-h|--help) ]] && {
+      # shellcheck disable=SC2034
+      _DESCRIPTION=\$(cat <<'EOF'
+  <<$1-description()>>
+  EOF
+  )
+      # shellcheck disable=SC2034
+      _EXAMPLE=\$(cat <<'EOF'
+  <<$1-example()>>
+  EOF
+  )
+  }

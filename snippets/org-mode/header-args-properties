@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: <h
+# key: <h
+# --
+:PROPERTIES:
+:header-args: $0
+:END:

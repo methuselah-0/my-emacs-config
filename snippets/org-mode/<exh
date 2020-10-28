@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: <exh
+# key: <exh
+# --
+#+begin_src bash :noweb-ref "" :cache yes :eval query-export

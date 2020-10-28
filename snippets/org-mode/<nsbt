@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: <nsbt
+# key: <nsbt
+# --
+#+name: $1-test
+#+begin_src bash :noweb-ref ""
+$0
+#+end_src

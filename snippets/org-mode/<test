@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: <test
+# key: <test
+# --
+#+name: $1-test-$2
+#+begin_src bash
+  $1_test_$2()(
+      [[ "\$($1 $0)" == ]] || { echo FAIL && return 1; }
+      echo PASS && return 0
+  )
+#+end_src

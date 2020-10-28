@@ -1,0 +1,35 @@
+# -*- mode: snippet -*-
+# expand-env: ((yas-after-exit-snippet-hook #'org-align-all-tags) (yas-indent-line 'fixed) (yas-wrap-around-region 'nil))
+# name: <bbp
+# key: <bbp
+# --
+    # shellcheck disable=SC2034
+    local _STACK z Options=() Input=() $2
+    [[ "\$1" =~ (-h|--help) ]] && {
+	local _DESCRIPTION _EXAMPLE	
+	# shellcheck disable=SC2034
+	_DESCRIPTION=\$(cat <<'EOF'
+<<$1-description()>>
+EOF
+)
+	# shellcheck disable=SC2034
+	_EXAMPLE=\$(cat <<'EOF'
+<<$1-example()>>
+EOF
+)
+    }
+
+    # Options
+    local null=(z null "" "Read null-separated input from stdin" 0)
+    Options+=("(\${null[*]@Q})")
+
+    # Operands
+    # shellcheck disable=SC2034
+    local -a Operands=(1:t:$2)
+
+    # Parse args
+    # shellcheck disable=SC2034
+    [[ ! -t 0 ]] && mapfile -t -d '' Input
+    setopts "\$@" || { printf '%s' "Parsing input failed: \${_STACK}" && bcu__stack "\$@" && return 1; }
+    [[ "\$1" =~ (-h|--help) ]] && return 0
+    $0

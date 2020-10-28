@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: <rt
+# key: <rt
+# --
+#+NAME: $1
+#+CAPTION: "$2"
+#+ATTR_HTML: :class right-table
+$0

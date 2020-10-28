@@ -1,0 +1,14 @@
+# -*- mode: snippet -*-
+# name: mainrun
+# key: mainrun
+# --
+declare -a org_args="\${org_args}"
+if [ "\${1:-\${org_args[0]}}" != "--source-only" ]; then
+    # $@ evaluates to all of the arguments passed to the function or script as individual strings.
+    if [[ -n "\$org_args" ]]; then
+	main "\${org_args[@]}"
+    else
+	main "\${@}"
+    fi
+fi
+$0

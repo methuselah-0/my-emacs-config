@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: <desc
+# key: <desc
+# --
+#+name: $1-description
+#+begin_src bash :noweb-ref "" :var apa=$1-info :session :exports none
+cat <<EOF
+\$apa
+EOF
+#+end_src
+$0
