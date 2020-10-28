@@ -189,7 +189,7 @@ the file =~/.emacs.d/config.org=
 #+end_src
 ** config.org
 
-Then add the config.org file in =~/.emacs.d/config.org
+Then add the config.org file in =~/.emacs.d/config.org=
 
 #+begin_src bash
   ln -s ~/.emacs.d/config.org ~/src/my-emacs-config/config.org
