@@ -491,8 +491,8 @@ goto-definition/documentation-at-point, and create a hook to restore
 the org-time-stamp binding of ~C-c .~.
 
 #+begin_src emacs-lisp
-  ;;(add-hook 'org-mode-hook 'my-jedi-server-setup)
-  ;;(add-hook 'org-mode-hook 'jedi:setup)
+  (add-hook 'org-mode-hook 'my-jedi-server-setup)
+  (add-hook 'org-mode-hook 'jedi:setup)
   (define-key org-mode-map (kbd "C-c d") 'jedi:goto-definition)
   (add-hook 'python-mode-hook '(lambda () (define-key python-mode-map (kbd "C-c d") 'jedi:goto-definition )))
   (add-hook 'org-mode-hook '(lambda () (define-key org-mode-map (kbd "C-c .") 'org-time-stamp)))
