@@ -76,118 +76,19 @@ For example, by:
   mv ~/.emacs.d ~/.emacs.d.bak
 #+end_src
 
-** init.el 
+** Create new ~/.emacs.d
 
-First create the directory =~/.emacs.d=:
+*** init.el
+
+Create the directory =~/.emacs.d= and link in init.el that will load
+the file =~/.emacs.d/config.org=:
 
 #+begin_src bash
   mkdir -p ~/.emacs.d
+  ln -s ~/src/my-emacs-config/init.el ~/.emacs.d/init.el
 #+end_src
 
-Then and add the file =init.el= with the content below. It will load
-the file =~/.emacs.d/config.org=
-
-#+begin_src emacs-lisp :tangle ~/.emacs.d/init.el
-  ;;; init.el --- Where all the magic begins
-  ;;
-  ;; This file loads Org-mode and then loads the rest of our Emacs initialization from Emacs lisp
-  ;; embedded in literate Org-mode files.
-
-  ;; Load up Org Mode and (now included) Org Babel for elisp embedded in Org Mode files
-  ;; (setq dotfiles-dir (file-name-directory (or (buffer-file-name) load-file-name)))
-
-  ;; (let* ((org-dir (expand-file-name
-  ;;                  "lisp" (expand-file-name
-  ;;                          "org" (expand-file-name
-  ;;                                 "src" dotfiles-dir))))
-  ;;        (org-contrib-dir (expand-file-name
-  ;;                          "lisp" (expand-file-name
-  ;;                                  "contrib" (expand-file-name
-  ;;                                             ".." org-dir))))
-  ;;        (load-path (append (list org-dir org-contrib-dir)
-  ;;                           (or load-path nil))))
-  ;;   ;; load up Org-mode and Org-babel
-  ;;   (require 'org-install)
-  ;;   (require 'ob-tangle))
-
-  ;; ;; load up all literate org-mode files in this directory
-  ;; (mapc #'org-babel-load-file (directory-files dotfiles-dir t "\\.org$"))
-
-  ;;; init.el ends here
-
-  ;; Added by Package.el.  This must come before configurations of
-  ;; installed packages.  Don't delete this line.  If you don't want it,
-  ;; just comment it out by adding a semicolon to the start of the line.
-  ;; You may delete these explanatory comments.
-  (require 'package)
-
-  ;; optional. makes unpure packages archives unavailable
-  (setf package-archives nil)
-
-  (setf package-enable-at-startup nil)
-  (package-initialize)
-
-  (org-babel-load-file "~/.emacs.d/config.org")
-
-  ;; (require 'org-install)
-  ;; (require 'ob-tangle)
-  ;; (org-babel-load-file (concat user-emacs-directory "config.org"))
-  (custom-set-variables
-   ;; custom-set-variables was added by Custom.
-   ;; If you edit it by hand, you could mess it up, so be careful.
-   ;; Your init file should contain only one such instance.
-   ;; If there is more than one, they won't work right.
-   '(ansi-color-names-vector
-     ["#0a0814" "#f2241f" "#67b11d" "#b1951d" "#4f97d7" "#a31db1" "#28def0" "#b2b2b2"])
-   '(custom-enabled-themes (quote (spacemacs-dark)))
-   '(custom-safe-themes
-     (quote
-      ("fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" default)))
-   '(hl-todo-keyword-faces
-     (quote
-      (("TODO" . "#dc752f")
-       ("NEXT" . "#dc752f")
-       ("THEM" . "#2d9574")
-       ("PROG" . "#4f97d7")
-       ("OKAY" . "#4f97d7")
-       ("DONT" . "#f2241f")
-       ("FAIL" . "#f2241f")
-       ("DONE" . "#86dc2f")
-       ("NOTE" . "#b1951d")
-       ("KLUDGE" . "#b1951d")
-       ("HACK" . "#b1951d")
-       ("TEMP" . "#b1951d")
-       ("FIXME" . "#dc752f")
-       ("XXX+" . "#dc752f")
-       ("\\?\\?\\?+" . "#dc752f"))))
-   '(org-re-reveal-script-files (quote ("js/reveal.js")))
-   '(package-selected-packages
-     (quote
-      (guix flycheck-pycheckers jedi org-re-reveal spacemacs-theme flycheck-pyflakes jupyter anaconda-mode ag ox-reveal ox-hugo ox-gfm org-alert syslog-mode nlinum rainbow-delimiters ac-geiser auto-complete-pcmp auto-complete paredit geiser)))
-   '(pdf-view-midnight-colors (quote ("#b2b2b2" . "#292b2e")))
-   '(safe-local-variable-values
-     (quote
-      ((org-babel-noweb-wrap-end . ">>;;")
-       (org-babel-noweb-wrap-start . ";;<<")
-       (org-src-preserve-indentation . t)
-       (org-my-aNumber . 32)
-       (org-my-foo . bar)
-       (org-babel-noweb-wrap-end . \">>)
-       (org-babel-noweb-wrap-start . \")
-       (org-confirm-babel-evaluate)
-       (org-babel-noweb-wrap-end . ">>#")
-       (org-babel-noweb-wrap-start . "#<<")
-       (eval modify-syntax-entry 43 "'")
-       (eval modify-syntax-entry 36 "'")
-       (eval modify-syntax-entry 126 "'")))))
-  (custom-set-faces
-   ;; custom-set-faces was added by Custom.
-   ;; If you edit it by hand, you could mess it up, so be careful.
-   ;; Your init file should contain only one such instance.
-   ;; If there is more than one, they won't work right.
-   )
-#+end_src
-** config.org
+*** config.org
 
 Then add the config.org file in =~/.emacs.d/config.org=
 
@@ -195,7 +96,23 @@ Then add the config.org file in =~/.emacs.d/config.org=
   ln -s ~/.emacs.d/config.org ~/src/my-emacs-config/config.org
 #+end_src
 
+*** symlink the elpa, elisp-files and snippets directories
+
+#+begin_src bash
+  ln -s ~/src/my-emacs-config/elpa ~/.emacs.d/elpa
+  ln -s ~/src/my-emacs-config/elisp-files ~/.emacs.d/elisp-files
+  ln -s ~/src/my-emacs-config/snippets ~/.emacs.d/snippets
+#+end_src
+
 ** Add emacs packages
+
+*** Guix
+
+If you don't have guix installed you can install it as a stand-alone
+distro or as a package manager. Find guix-install.sh to try it out on
+a "foreign distro". Make sure to run ~guix pull~ as both root and your
+normal user before continuing. If you already have Guix installed, you
+can just continue.
 
 *** install emacs packages via Guix manifest
 
@@ -216,9 +133,6 @@ First we install a guix channel to pull our emacs packages from:
 	)
 #+end_src
 
-Alternatively, you can pass a channels option to =guix package -m
-my-manifest.scm= to and not change your default profile.
-
 Now we need to update with the new channels:
 
 #+begin_src bash
@@ -228,58 +142,22 @@ Now we need to update with the new channels:
 Next download the following package manifest:
 
 #+begin_src bash
-  mkdir -p ~/guix-profiles
-  wget -O ~/guix-profiles/manifest.scm "https://raw.githubusercontent.com/methuselah-0/my-guixsd-config.sh/master/user1.scm"
+  mkdir -p ~/guix-manifests
+  wget -O ~/guix-manifests/emacs-setup.scm "https://raw.githubusercontent.com/methuselah-0/my-guixsd-config.sh/master/user1.scm"
 #+end_src
 
 You could modify it to your liking, perhaps merge and fix with your
 own current list of packages or manifest. When done, apply it:
 
 #+begin_src bash
-  guix package -m ~/guix-profiles/manifest.scm
+  guix package --fallback -m ~/guix-manifests/emacs-setup.scm
 #+end_src
+
+Alternatively, you can just use ~guix package --channels=/tmp/channels.scm --fallback -m
+~/guix-manifests/emacs-setup.scm~
 
 If this breaks your stuff you might have to fix stuff here before
 continuing.
-
-*** symlink the elpa and elisp-files directories
-
-#+begin_src bash
-  ln -s ~/src/my-emacs-config/elpa ~/.emacs.d/elpa
-  ln -s ~/src/my-emacs-config/elisp-files ~/.emacs.d/elisp-files
-#+end_src
-
-** cronjob extra
-
-For org-alert to work as intended here, we need to continuously add
-new the NEXT todo-keyword in the org-headers when events are within
-half an hour. These needs to be inserted by a perl-script that runs
-once a minute. I also have an ics-calender that I want fetched and
-updated once a minute. To do this I run fetch-calendars.pl which also
-calls out to ical2org.pl and org-schedule.pl and it is org-schedule.pl
-that updates the NEXT header.
-
-As I'm on GuixSD, I run the cronjob by adding the following to
-=~/.config/cron/job.guile=:
-
-#+begin_src emacs-lisp :eval never :tangle ~/.config/cron/job.guile
-;; -*- geiser-scheme-implementation: guile -*-
-;; make sure to add mcron & in ~/.profile
-;; (job '(next-minute (range 0 60 5)) "dosomethingevery5minutes")
-;; (job '(next-minute (range 0 60 10)) "dosomethingevery10minutes")
-(job '(next-minute (range 0 60 1)) "perl ~/src/my-emacs-config/fetch-calendars.pl ~/.emacs.d/ics-calendars.txt ~/.emacs.d/todokeywords.txt")
-#+end_src
-
-and also by adding =mcron &= to =~/.profile=.
-
-#+begin_src bash :eval never :tangle ~/.profile
-mcron &
-#+end_src
-
-Note that the todokeywords.txt file is created via an org-mode-hook
-defined in config.org so if you change the path or the hook this
-cronjob needs adjusted as well. The =ics-calendars.txt= file is setup
-as [[*caldav-conf.el][below]].
 
 ** Special configuration files
 *** caldav-conf.el
@@ -343,3 +221,43 @@ These are your own org-files that you can add to for example:
 
 You probably want to edit the contacts files.
 
+** cronjob extra
+
+For org-alert to work as intended here, we need to continuously add
+the NEXT todo-keyword in the org-headers when events are within half
+an hour. These needs to be inserted by a perl-script that runs once a
+minute. I also have an ics-calender that I want fetched and updated
+once a minute. To do this I run fetch-calendars.pl which also calls
+out to ical2org.pl and org-schedule.pl and it is org-schedule.pl that
+updates the NEXT header.
+
+As I'm on GuixSD, I run the cronjob by adding the following to
+=~/.config/cron/job.guile=:
+
+#+begin_src emacs-lisp :eval never :tangle ~/.config/cron/job.guile
+;; -*- geiser-scheme-implementation: guile -*-
+;; make sure to add mcron & in ~/.profile
+;; (job '(next-minute (range 0 60 5)) "dosomethingevery5minutes")
+;; (job '(next-minute (range 0 60 10)) "dosomethingevery10minutes")
+(job '(next-minute (range 0 60 1)) "perl ~/src/my-emacs-config/fetch-calendars.pl ~/.emacs.d/ics-calendars.txt ~/.emacs.d/todokeywords.txt")
+#+end_src
+
+and also by adding =mcron &= to =~/.profile=. However, before running
+mcron, make sure to start emacs once first, because the
+todokeywords.txt file is created via an org-mode-hook defined in
+config.org so if you change the path or the hook this cronjob needs
+adjusted as well. The =ics-calendars.txt= file is setup as [[*caldav-conf.el][below]].
+
+
+#+begin_src bash :eval never :tangle ~/.profile
+mcron &
+#+end_src
+
+* First start
+
+First time you open an org-mode buffer you will be prompted to run
+=M-x jedi:install-server= which means press "Alt" and "x" keys
+together then type =jedi:install-server= and hit "Enter" or
+"Return". Due to some weird stuff - possibly with Guix, you should
+exit emacs, run =guix install python-pip=, restart emacs and then
+rerun the command.
