@@ -70,11 +70,15 @@
      ("\\?\\?\\?+" . "#dc752f")))
  '(org-re-reveal-script-files '("js/reveal.js"))
  '(package-selected-packages
-   '(flymake-python-pyflakes rope-read-mode ob-ipython ein guix flycheck-pycheckers jedi org-re-reveal spacemacs-theme flycheck-pyflakes jupyter anaconda-mode ag ox-reveal ox-hugo ox-gfm org-alert syslog-mode nlinum rainbow-delimiters ac-geiser auto-complete-pcmp auto-complete paredit geiser))
+   '(flymake-python-pyflakes rope-read-mode ob-ipython ein guix flycheck-pycheckers jedi spacemacs-theme flycheck-pyflakes jupyter anaconda-mode ag ox-reveal ox-hugo ox-gfm org-alert syslog-mode nlinum rainbow-delimiters ac-geiser auto-complete-pcmp auto-complete paredit geiser))
  '(pdf-view-midnight-colors '("#b2b2b2" . "#292b2e"))
  '(python-indent-guess-indent-offset-verbose nil)
  '(safe-local-variable-values
-   '((geiser-scheme-implementation . guile)
+   '((org-repo-nbs-root . /home/user1/src/nbdev-org-babel-example/nbs)
+     (org-repo-root . /home/user1/src/nbdev-org-babel-example)
+     (org-repo-root . /home/user1/src/nbdev-projects/awesomelib)
+     (org-repo-root . "../../")
+     (geiser-scheme-implementation . guile)
      (org-babel-noweb-wrap-end . ">>;;")
      (org-babel-noweb-wrap-start . ";;<<")
      (org-src-preserve-indentation . t)
