@@ -471,7 +471,7 @@ Python auto-complete with jedi.el. Add --sys-path <file-dir> to
 jedi-mode startup so that functions from imports that are in relative
 path to the current filename also show up in auto-complete etc.
 
-#+begin_src emacs-lisp
+,#+begin_src emacs-lisp
   ;; (setq jedi:server-args
   ;;       '("--sys-path" "/home/user1/src/code_python/ipstocidrdir"))
   (defun my-jedi-server-setup ()
@@ -479,13 +479,50 @@ path to the current filename also show up in auto-complete etc.
 	    (if (string-match "\*Org Src" (buffer-name (current-buffer)))
 		(file-name-directory (buffer-file-name (org-src-source-buffer)))	
 	      (file-name-directory (buffer-file-name (current-buffer)))))
-	   (args (list "--sys-path" filedir))	
+	   (args (list "--sys-path" filedir))
 	  )
       (set (make-local-variable 'jedi:server-args) args)))
   (add-hook 'python-mode-hook 'my-jedi-server-setup)
   ;;(setq jedi:complete-on-dot t)                 ; optional
   (add-hook 'python-mode-hook 'jedi:setup)
+,#+end_src
+
+
+#+RESULTS:
+
+
+#+begin_src emacs-lisp
+  ;; (setq jedi:server-args
+  ;;       '("--sys-path" "/home/user1/src/code_python/ipstocidrdir"))
+  (defun my-jedi-server-setup ()
+    (let* ((filedir
+	    (if (string-match "\*Org Src" (buffer-name (current-buffer)))
+		(let* (
+		       (fnd-arg (buffer-file-name (org-src-source-buffer)))
+		       )
+		  (if (stringp fnd-arg)
+		      (file-name-directory (buffer-file-name (org-src-source-buffer)))
+		    ""
+		    ))
+	      (let
+		  ((fnd-arg (buffer-file-name (current-buffer))))
+		(if (stringp fnd-arg)
+		    (file-name-directory fnd-arg)
+		  ""
+		  ))
+	      ))
+	   (args (list "--sys-path" filedir))
+	   )
+      (if (string-match ".+" filedir)
+	  (set (make-local-variable 'jedi:server-args) args))))
+  (add-hook 'python-mode-hook 'my-jedi-server-setup)
+  ;;(setq jedi:complete-on-dot t)                 ; optional
+  (add-hook 'python-mode-hook 'jedi:setup)
 #+end_src
+
+#+RESULTS:
+: /home/user1/VirtualHome/src/my-emacs-config/
+
 
 Also start jedi-mode when in org-mode files. Since ~C-c .~ is taken in
 org-mode we add another key-binding for
