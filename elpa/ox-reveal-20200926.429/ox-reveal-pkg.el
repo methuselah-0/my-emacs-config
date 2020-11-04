@@ -1,2 +1,0 @@
-;;; Generated package description from /home/user1/.emacs.d/elpa/ox-reveal-20200926.429/ox-reveal.el  -*- no-byte-compile: t -*-
-(define-package "ox-reveal" "20200926.429" "reveal.js Presentation Back-End for Org Export Engine" '((org "8.3")) :commit "79b01ae85bccf3622dc79d17d3eceebfa9a81636" :keywords '("outlines" "hypermedia" "slideshow" "presentation") :authors '(("Yujie Wen <yjwen.ty at gmail dot com>")) :maintainer '("Yujie Wen <yjwen.ty at gmail dot com>"))

@@ -32,7 +32,9 @@ Return output file name.
 \(fn PLIST FILENAME PUB-DIR &optional BACKEND)" nil nil)
 
 (autoload 'org-re-reveal-version "org-re-reveal" "\
-Display version string for org-re-reveal from Lisp file." t nil)
+Display version string for org-re-reveal from Lisp file.
+
+\(fn)" t nil)
 
 (if (fboundp 'register-definition-prefixes) (register-definition-prefixes "org-re-reveal" '("org-re-reveal-")))
 

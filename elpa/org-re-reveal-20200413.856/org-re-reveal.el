@@ -8,7 +8,7 @@
 ;; SPDX-FileCopyrightText: 2017-2020 Jens Lechtenbörger
 
 ;; URL: https://gitlab.com/oer/org-re-reveal
-;; Version: 3.4.2
+;; Version: 2.12.1
 ;; Package-Requires: ((emacs "24.4") (org "8.3") (htmlize "1.34"))
 ;; Keywords: tools, outlines, hypermedia, slideshow, presentation, OER
 
@@ -51,16 +51,12 @@
 ;;    (c) Export to HTML: Press "C-c C-e v v" (write HTML file) or
 ;;        "C-c C-e v b" (write HTML file and open in browser)
 ;; See "Readme.org" for introduction, details, and features added to
-;; org-reveal:
-;; https://gitlab.com/oer/org-re-reveal/-/blob/master/Readme.org
-;; The Readme is also available as reveal.js presentation that is
-;; generated with org-re-reveal in a CI/CD infrastructure on GitLab:
-;; https://oer.gitlab.io/org-re-reveal/Readme.html
+;; org-reveal.
 ;;
 ;; Note that emacs-reveal offers a project that embeds org-re-reveal,
 ;; reveal.js, and various reveal.js plugins:
 ;; https://gitlab.com/oer/emacs-reveal
-;; Its howto, generated from Org source file with emacs-reveal:
+;; Its howto, generated from Org source file in GitLab CI environment:
 ;; https://oer.gitlab.io/emacs-reveal-howto/howto.html
 ;;
 ;; The package org-re-reveal grew out of a forked version of org-reveal
@@ -94,12 +90,6 @@
         "Current subtree to file" org-re-reveal-export-current-subtree)))
 
     :options-alist ; See org-export-options-alist for meaning of parts.
-    ;; First options, then keywords; in both cases with variables for
-    ;; default values.  Final values indicate how multiple occurrences
-    ;; of keywords are treated, including nil, t, newline:
-    ;; nil: Keep old value, discard new one
-    ;; t: Use new value, discard old one
-    ;; newline: Concatenate with newlines
     '((:reveal-center nil "reveal_center" org-re-reveal-center t)
       (:reveal-control nil "reveal_control" org-re-reveal-control t)
       (:reveal-defaulttiming nil "reveal_defaulttiming" org-re-reveal-defaulttiming t)
@@ -124,7 +114,6 @@
       (:reveal-subtree-with-title-slide nil "reveal_subtree_with_title_slide" org-re-reveal-subtree-with-title-slide t)
       (:reveal-width nil "reveal_width" org-re-reveal-width t)
       (:reveal-academic-title "REVEAL_ACADEMIC_TITLE" nil nil t)
-      (:reveal-add-plugin "REVEAL_ADD_PLUGIN" nil nil newline)
       (:reveal-codemirror-config "REVEAL_CODEMIRROR_CONFIG" nil org-re-reveal-klipse-codemirror newline)
       (:reveal-default-frag-style "REVEAL_DEFAULT_FRAG_STYLE" nil org-re-reveal-default-frag-style t)
       (:reveal-default-slide-background "REVEAL_DEFAULT_SLIDE_BACKGROUND" nil nil t)
@@ -132,11 +121,10 @@
       (:reveal-default-slide-background-repeat "REVEAL_DEFAULT_SLIDE_BACKGROUND_REPEAT" nil nil t)
       (:reveal-default-slide-background-size "REVEAL_DEFAULT_SLIDE_BACKGROUND_SIZE" nil nil t)
       (:reveal-default-slide-background-transition "REVEAL_DEFAULT_SLIDE_BACKGROUND_TRANSITION" nil nil t)
-      (:reveal-export-notes-to-pdf "REVEAL_EXPORT_NOTES_TO_PDF" nil
-                                   org-re-reveal-export-notes-to-pdf t)
       (:reveal-external-plugins "REVEAL_EXTERNAL_PLUGINS" nil org-re-reveal-external-plugins t)
       (:reveal-extra-attr "REVEAL_EXTRA_ATTR" nil org-re-reveal-extra-attr nil)
       (:reveal-extra-css "REVEAL_EXTRA_CSS" nil org-re-reveal-extra-css newline)
+      (:reveal-extra-js "REVEAL_EXTRA_JS" nil org-re-reveal-extra-js nil)
       (:reveal-extra-options "REVEAL_EXTRA_OPTIONS" nil org-re-reveal-extra-options t)
       (:reveal-extra-scripts "REVEAL_EXTRA_SCRIPTS" nil org-re-reveal-extra-scripts nil)
       (:reveal-head-preamble "REVEAL_HEAD_PREAMBLE" nil org-re-reveal-head-preamble newline)
@@ -161,6 +149,7 @@
       (:reveal-postamble "REVEAL_POSTAMBLE" nil org-re-reveal-postamble t)
       (:reveal-preamble "REVEAL_PREAMBLE" nil org-re-reveal-preamble t)
       (:reveal-root "REVEAL_ROOT" nil org-re-reveal-root t)
+      (:reveal-script-files "REVEAL_SCRIPT_FILES" nil org-re-reveal-script-files t)
       (:reveal-slide-footer "REVEAL_SLIDE_FOOTER" nil org-re-reveal-slide-footer t)
       (:reveal-slide-header "REVEAL_SLIDE_HEADER" nil org-re-reveal-slide-header t)
       (:reveal-speed "REVEAL_SPEED" nil org-re-reveal-transition-speed t)
@@ -173,14 +162,12 @@
       (:reveal-title-slide-background-repeat "REVEAL_TITLE_SLIDE_BACKGROUND_REPEAT" nil nil t)
       (:reveal-title-slide-background-size "REVEAL_TITLE_SLIDE_BACKGROUND_SIZE" nil nil t)
       (:reveal-title-slide-background-transition "REVEAL_TITLE_SLIDE_BACKGROUND_TRANSITION" nil nil t)
-      (:reveal-title-slide-notes "REVEAL_TITLE_SLIDE_NOTES" nil org-re-reveal-title-slide-notes t)
       (:reveal-title-slide-state "REVEAL_TITLE_SLIDE_STATE" nil nil t)
       (:reveal-title-slide-timing "REVEAL_TITLE_SLIDE_TIMING" nil nil t)
       (:reveal-toc-slide-class "REVEAL_TOC_SLIDE_CLASS" nil nil t)
       (:reveal-toc-slide-state "REVEAL_TOC_SLIDE_STATE" nil nil t)
       (:reveal-toc-slide-title "REVEAL_TOC_SLIDE_TITLE" nil org-re-reveal-toc-slide-title t)
-      (:reveal-trans "REVEAL_TRANS" nil org-re-reveal-transition t)
-      (:reveal-version "REVEAL_VERSION" nil org-re-reveal-revealjs-version t))
+      (:reveal-trans "REVEAL_TRANS" nil org-re-reveal-transition t))
 
     :translate-alist
     '((headline . org-re-reveal-headline)
@@ -193,6 +180,7 @@
                           (setq info (plist-put info :reveal-mathjax t))
                           (org-html-latex-fragment frag contents info)))
       (plain-list . org-re-reveal-plain-list)
+      (quote-block . org-re-reveal-quote-block)
       (section . org-re-reveal-section)
       (src-block . org-re-reveal-src-block)
       (special-block . org-re-reveal-special-block)
@@ -215,10 +203,7 @@ SYMBOL must be `org-re-reveal-keys' and VALUE its new value."
     (org-re-reveal-define-backend)))
 
 (defgroup org-export-re-reveal nil
-  "Options for exporting Org files to reveal.js HTML pressentations.
-See URL `https://oer.gitlab.io/org-re-reveal/Readme.html' for the
-Readme of org-re-reveal as reveal.js presentation that is generated
-from its Org mode source file in a CI/CD infrastructure on GitLab."
+  "Options for exporting Org files to reveal.js HTML pressentations."
   :tag "Org Export Reveal"
   :group 'org-export)
 
@@ -237,69 +222,20 @@ browsing that file, subtree export to file."
                (character :tag "Key for subtree export to file"))
   :set #'org-re-reveal-define-menu)
 
-(defconst org-re-reveal-revealjs-4-file "dist/reveal.js")
-(defconst org-re-reveal-revealjs-3-file "js/reveal.js")
-(defconst org-re-reveal-revealjs-pre-3.8-file "lib/js/head.min.js")
-
-(defun org-re-reveal--guess-revealjs-version (info)
-  "Guess version of reveal.js with INFO.
-Assign guessed version of reveal.js to `:reveal-guessed-revealjs-version':
-Use `org-re-reveal-revealjs-version' if it is non-nil.
-Otherwise, check for existence of files under `org-re-reveal-root' and
-- assign \"4\" if `org-re-reveal-revealjs-4-file' exists;
-- otherwise, if `org-re-reveal-revealjs-3-file' exists and
-  `org-re-reveal-revealjs-pre-3.8-file' does not exist, assign \"3.8\";
-- otherwise, assign \"3\"."
-  (let ((version (plist-get info :reveal-version))
-        (root-path (file-name-as-directory (plist-get info :reveal-root))))
-    (plist-put info :reveal-guessed-revealjs-version
-               (if version
-		   version
-		 (if (file-exists-p
-                      (concat root-path org-re-reveal-revealjs-4-file))
-                     "4"
-		   (if (and
-			(file-exists-p
-			 (concat root-path org-re-reveal-revealjs-3-file))
-			(not (file-exists-p
-                              (concat root-path
-                                      org-re-reveal-revealjs-pre-3.8-file))))
-                       "3.8"
-                     "3"))))))
-
-(defun org-re-reveal--setup-paths (info)
-  "Setup paths for reveal.js based in INFO."
-  (org-re-reveal--guess-revealjs-version info)
-  (let ((revealjs-version (plist-get info :reveal-guessed-revealjs-version)))
-    (cond ((string= revealjs-version "4")
-	   (plist-put info :reveal-script-files '("dist/reveal.js"))
-	   (plist-put info :reveal-css-path "dist"))
-          ((string= revealjs-version "3.8")
-	   (plist-put info :reveal-script-files '("js/reveal.js"))
-	   (plist-put info :reveal-css-path "css"))
-          (t (plist-put info :reveal-script-files '("lib/js/head.min.js" "js/reveal.js"))
-	     (plist-put info :reveal-css-path "css")))))
-
-(defcustom org-re-reveal-revealjs-version nil
-  "Specify version of reveal.js.
-If nil, `org-re-reveal' tries to guess the version, which works if
-`org-re-reveal-root' is a local directory."
-  :group 'org-export-re-reveal
-  :type '(choice (const :tag "reveal.js 4.0 and later" "4")
-                 (const :tag "reveal.js 3.8 and 3.9" "3.8")
-                 (const :tag "reveal.js before 3.8" "3")
-                 (const :tag "Guess" nil))
-  :package-version '(org-re-reveal . "3.0.0"))
-
 (defcustom org-re-reveal-root "./reveal.js"
-  "Specify root directory of reveal.js.
-The root directory is the one containing dist/reveal.js (reveal.js 4.x)
-or js/reveal.js (earlier versions).
-If you set this to a CDN location, make sure that
-`org-re-reveal-revealjs-version' is set properly as well."
+  "Specify root directory of reveal.js containing js/reveal.js."
   :group 'org-export-re-reveal
-  :type 'string
-  :package-version '(org-re-reveal . "3.0.3"))
+  :type '(radio (const :tag "Online at https://revealjs.com" "https://revealjs.com")
+                (string :tag "Other directory path")))
+
+(defcustom org-re-reveal-script-files '("lib/js/head.min.js" "js/reveal.js")
+  "Specify files to initialize reveal.js.
+Note that file names here are relative under `org-re-reveal-root'.
+On 2018-10-04, head.min.js was removed on the dev branch of reveal.js.
+If you are using a version including that removal, customize this variable
+to remove the first file name."
+  :group 'org-export-re-reveal
+  :type '(repeat string))
 
 (defcustom org-re-reveal-hlevel 1
   "Specify minimum level of headings for grouping into vertical slides."
@@ -330,14 +266,13 @@ slide, where the following %-sequences are allowed:
   %q for the name of a file to a QR code (set with #+REVEAL_TALK_QR_CODE).
   %u for the URL of the presentation (set with #+REVEAL_TALK_URL).
   %m for misc information (set with #+REVEAL_MISCINFO).
-  %n for notes on the title slide (see `org-re-reveal-title-slide-notes').
   %% for a literal %.
 
 Alternatively, the string can also be the name of a file with the title
 slide's HTML code (containing the above escape sequences)."
   :group 'org-export-re-reveal
   :type '(choice (const :tag "No title slide" nil)
-                 (const :tag "Auto title slide" auto)
+                 (const :tag "Auto title slide" 'auto)
                  (string :tag "Custom title slide")))
 
 (defcustom org-re-reveal-transition "convex"
@@ -380,19 +315,12 @@ and URL `https://github.com/google/fonts/issues/1495'."
                 (string :tag "Other theme"))
   :package-version '(org-re-reveal . "2.8.1"))
 
-(defcustom org-re-reveal-export-notes-to-pdf nil
-  "Control `showNotes' option for PDF export.
-With the default value nil, default reveal.js behavior applies without
-an option `showNotes'; see URL `https://revealjs.com/pdf-export/'.
-With t, notes appear in an overlay box.
-Any string value is copied literally to the `showNotes' option; meant
-to be used with \"separate-page\"."
+(defcustom org-re-reveal-extra-js ""
+  "URL to extra JS file.
+If you use this variable, please take the time to report your current
+usage at URL `https://gitlab.com/oer/org-re-reveal/issues/31'."
   :group 'org-export-re-reveal
-  :type '(choice
-          (const :tag "Do not add \"showNotes\" option" nil)
-          (const :tag "Add \"showNotes: true\"" t)
-          (const :tag "Add \"showNotes: 'separate-page'\"" "separate-page"))
-  :package-version '(org-re-reveal . "3.1.0"))
+  :type 'string)
 
 (defcustom org-re-reveal-extra-scripts nil
   "List of extra scripts.
@@ -403,6 +331,8 @@ HTML file."
   :group 'org-export-re-reveal
   :type '(repeat string)
   :package-version '(org-re-reveal . "2.10.0"))
+(make-obsolete-variable 'org-re-reveal-extra-js
+                        'org-re-reveal-extra-scripts "org-re-reveal 2.9.0")
 
 (defcustom org-re-reveal-extra-attr nil
   "Global Reveal Extra Attrs for all slides."
@@ -448,15 +378,6 @@ To enable multiplex, see `org-re-reveal-plugins'."
   :type 'string
   :package-version '(org-re-reveal . "2.1.0"))
 
-(defcustom org-re-reveal-multiplex-client-ext "_client"
-  "Extension to insert in names of multiplex client presentations.
-The name of the multiplex master presentation is derived from
-`org-html-extension'.  For client presentations, the value of this
-variable is inserted before the HTML extension."
-  :group 'org-export-re-reveal
-  :type 'string
-  :package-version '(org-re-reveal . "3.2.0"))
-
 (defcustom org-re-reveal-client-multiplex-filter nil
   "If non-nil, a regular expression to filter multiplex client publication.
 When using `org-re-reveal-publish-to-reveal-client', by default all Org
@@ -472,37 +393,32 @@ client file should be generated."
   :package-version '(org-re-reveal . "2.12.0"))
 
 (defcustom org-re-reveal-control t
-  "If nil, hide presentation control arrows.
-See URL `https://revealjs.com/config/'."
+  "Reveal control applet."
   :group 'org-export-re-reveal
   :type 'boolean)
 
 (defcustom org-re-reveal-progress t
-  "If nil, progress bar.
-See URL `https://revealjs.com/config/'."
+  "Reveal progress applet."
   :group 'org-export-re-reveal
   :type 'boolean)
 
 (defcustom org-re-reveal-history nil
-  "If non-nil, push each slide change to the browser history.
-See URL `https://revealjs.com/config/'."
+  "Reveal history applet."
   :group 'org-export-re-reveal
   :type 'boolean)
 
 (defcustom org-re-reveal-center t
-  "If nil, do not center slides vertically.
-See URL `https://revealjs.com/config/'."
+  "Reveal center applet."
   :group 'org-export-re-reveal
   :type 'boolean)
 
 (defcustom org-re-reveal-rolling-links nil
-  "Option to show links with rolling effect for reveal.js 3.x."
+  "Reveal use rolling links."
   :group 'org-export-re-reveal
   :type 'boolean)
 
 (defcustom org-re-reveal-slide-number "c"
-  "Choose slide number format.
-See URL `https://revealjs.com/config/'."
+  "Reveal showing slide numbers."
   :group 'org-export-re-reveal
   :type '(radio (const :tag "horizontal . vertical slide number" "h.v")
                 (const :tag "horizontal / vertical slide number" "h/v")
@@ -511,46 +427,39 @@ See URL `https://revealjs.com/config/'."
                 (string :tag "Other slide number format")))
 
 (defcustom org-re-reveal-keyboard t
-  "If nil, disable keyboard navigation.
-See URL `https://revealjs.com/config/'."
+  "Reveal use keyboard navigation."
   :group 'org-export-re-reveal
   :type 'boolean)
 
 (defcustom org-re-reveal-mousewheel nil
-  "If t, enable mousewheel navigation.
-See URL `https://revealjs.com/config/'."
+  "Reveal use mousewheel navigation."
   :group 'org-export-re-reveal
   :type 'boolean)
 
 (defcustom org-re-reveal-fragmentinurl nil
-  "If t, enable fragmentInURL setting.
-See URL `https://revealjs.com/config/'."
+  "Reveal use fragmentInURL setting."
   :group 'org-export-re-reveal
   :type 'boolean)
 
 (defcustom org-re-reveal-hashonebasedindex nil
-  "If t, enable hashOneBasedIndex setting.
-See URL `https://revealjs.com/config/'."
+  "Reveal use hashOneBasedIndex setting."
   :group 'org-export-re-reveal
   :type 'boolean)
 
 (defcustom org-re-reveal-pdfseparatefragments t
-  "If nil, disable pdfSeparateFragments setting.
-See URL `https://revealjs.com/config/'."
+  "Reveal disable pdfSeparateFragments setting."
   :group 'org-export-re-reveal
   :type 'boolean)
 
 (defcustom org-re-reveal-defaulttiming nil
   "If non-nil, use defaultTiming for speaker notes view.
-See URL `https://revealjs.com/config/'.
 For indivual timing of specific slides, use \"REVEAL_TITLE_SLIDE_TIMING\" for
 the title slide, and assign data-timing attributes to other headlines/slides."
   :group 'org-export-re-reveal
   :type '(choice integer (const nil)))
 
 (defcustom org-re-reveal-overview t
-  "If nil, disable slide overview mode.
-See URL `https://revealjs.com/config/'."
+  "Reveal show overview."
   :group 'org-export-re-reveal
   :type 'boolean)
 
@@ -669,23 +578,6 @@ Must constain exactly one %-sequence \"%s\"."
   :group 'org-export-re-reveal
   :type 'string)
 
-(defcustom org-re-reveal-notes-format-string
-  "<aside class=\"notes\">\n%s\n</aside>\n"
-  "HTML format string to construct aside element for notes.
-Must constain exactly one %-sequence \"%s\"."
-  :group 'org-export-re-reveal
-  :type 'string
-  :package-version '(org-re-reveal . "3.3.0"))
-
-(defcustom org-re-reveal-title-slide-notes nil
-  "Name of file to define speaker notes on title slide or nil.
-If non-nil, export contents of the file as speaker notes for the title slide.
-To insert speaker notes into the title slide, use \"%n\" as specified
-for `org-re-reveal-title-slide'."
-  :group 'org-export-re-reveal
-  :type '(choice (const nil) file)
-  :package-version '(org-re-reveal . "3.3.0"))
-
 (defcustom org-re-reveal-default-frag-style nil
   "Default fragment style."
   :group 'org-export-re-reveal
@@ -695,11 +587,10 @@ for `org-re-reveal-title-slide'."
   '(markdown notes search zoom)
   "Default builtin plugins.
 
-By default, multiplex is not enabled.  With reveal.js 4.x, multiplex
-needs to be downloaded separately.
-Include `multiplex' in this variable to enable it.
+By default,　variables related to multiplex are hidden.
+Include 'multiplex in this variable to enable it.
 
-This variable, like lots of other variables, can be overridden
+This variable, like any other variable, can be overridden
 in the org buffer comments as follows:
   #+REVEAL_PLUGINS: (markdown zoom notes multiplex)"
   :group 'org-export-re-reveal
@@ -709,31 +600,10 @@ in the org buffer comments as follows:
           (const zoom)
           (const notes)
           (const search)
-          (const :tag "math (reveal.js 4.x)" math)
-          (const :tag "multiplex (not included in reveal.js 4.x)" multiplex)
+          (const multiplex)
           (const :tag "classList (absent from modern reveal.js)" classList)
           (const :tag "remotes (absent from modern reveal.js)" remotes))
-  :package-version '(org-re-reveal . "3.0.0"))
-
-(defcustom org-re-reveal-plugin-config
-  '((highlight "RevealHighlight" "plugin/highlight/highlight.js")
-    (markdown "RevealMarkdown" "plugin/markdown/markdown.js")
-    (math "RevealMath" "plugin/math/math.js")
-    (notes "RevealNotes" "plugin/notes/notes.js")
-    (search "RevealSearch" "plugin/search/search.js")
-    (zoom "RevealZoom" "plugin/zoom/zoom.js"))
-  "Initialization for reveal.js 4.x plugins.
-This is a list of triples.  Each triple consists of
-- the plugin name, listed in `org-re-reveal-plugins',
-- the JavaScript name for the plugin,
-- the name of the JavaScript file."
-  :group 'org-export-oer-reveal
-  :type '(repeat
-          (list
-           (symbol :tag "Plugin name")
-           (string :tag "JavaScript plugin name")
-           (string :tag "JavaScript file name")))
-  :package-version '(org-re-reveal . "3.0.0"))
+  :package-version '(org-re-reveal . "1.1.11"))
 
 (defcustom org-re-reveal-external-plugins nil
   "Additional third-party plugins to load with reveal.js.
@@ -764,19 +634,13 @@ That file embeds JS scripts and pictures."
   :group 'org-export-re-reveal
   :type '(choice (const nil) string))
 
-(defcustom org-re-reveal-highlight-css 'zenburn
-  "Highlight.js CSS style.
-Styles distributed with reveal.js are monokai and zenburn.
-Alternatively, use any file path or URL.  The file path may contain the
-placeholder \"%r\", to be replaced with the root directory of reveal.js."
+(defcustom org-re-reveal-highlight-css "%r/lib/css/zenburn.css"
+  "Hightlight.js CSS file."
   :group 'org-export-re-reveal
-  :type '(choice (const monokai)
-                 (const zenburn)
-                 (string :tag "Other CSS file or URL"))
-  :package-version '(org-re-reveal . "3.0.0"))
+  :type 'string)
 
 (defcustom org-re-reveal-highlight-url nil
-  "Location of Highlight.js.
+  "Location of Hightlight.js.
 If nil (default), the local plugin file is used."
   :group 'org-export-re-reveal
   :type '(choice (const nil) string))
@@ -917,6 +781,29 @@ See there: https://github.com/hakimel/reveal.js/issues/2276")
 Otherwise, return empty string."
   (if (and (stringp val) (> (length val) 0)) (format fmt val) ""))
 
+(defun org-re-reveal--frag-style (frag info)
+  "Return fragment string according to FRAG and the default fragment style.
+FRAG is the fragment style set on element, INFO is a plist
+holding contextual information."
+  (cond
+   ((string= frag t)
+    (let ((default-frag-style (plist-get info :reveal-default-frag-style)))
+      (if default-frag-style (format "fragment %s" default-frag-style)
+        "fragment")))
+   (t (format "fragment %s" frag))))
+
+(defun org-re-reveal--frag-class (frag info)
+  "Return proper HTML string description of fragment style.
+FRAG is the fragment style set on element, INFO is a plist
+holding contextual information."
+  (and frag
+       (format " class=\"%s\"" (org-re-reveal--frag-style frag info))))
+
+(defun org-re-reveal--frag-index (index)
+  "Return attribute string for fragment INDEX if set."
+  (and index
+       (format " data-fragment-index=\"%s\"" index)))
+
 (defun org-re-reveal-special-block (special-block contents info)
   "Transcode a SPECIAL-BLOCK element from Org to Reveal.
 CONTENTS holds the contents of the block.  INFO is a plist
@@ -927,10 +814,10 @@ into a Reveal.js slide note.  Otherwise, export the block as by the HTML
 exporter."
   (let ((block-type (org-element-property :type special-block)))
     (if (string= (downcase block-type) "notes")
-        (format org-re-reveal-notes-format-string contents)
+        (format "<aside class=\"notes\">\n%s\n</aside>\n" contents)
       (org-html-special-block special-block contents info))))
 
-(defun org-re-reveal--html-header-add-class (elem value)
+(defun org-re-reveal--add-class (elem value)
   "Add VALUE as \"class\" attribute in HTML header element ELEM.
 Do nothing if \"class\" attribute is already present."
   (let ((match (string-match "\\`<h[1-9][^>]+>" elem)))
@@ -966,7 +853,7 @@ have been appropriate..."
             ;; Return the HTML content unchanged
             html)))
     (if class
-        (org-re-reveal--html-header-add-class nodiv class)
+        (org-re-reveal--add-class nodiv class)
       nodiv)))
 
 (defun org-re-reveal--section-attrs (headline info)
@@ -1060,17 +947,14 @@ holding contextual information."
 
 (defun org-re-reveal--read-list (thing)
   "Return THING if it is a list.
-Return nil if THING is the empty string.
 Otherwise, `read' THING and return value if it is a list.
 Otherwise, raise an error."
   (if (listp thing)
       thing
-    (if (and (stringp thing) (= 0 (length thing)))
-        nil
-      (let ((lthing (read thing)))
-        (if (listp lthing)
-            lthing
-          (error "Expected a list, but got: %s" thing))))))
+    (let ((lthing (read thing)))
+      (if (listp lthing)
+          lthing
+        (error "Expected a list, but got: %s" thing)))))
 
 (defun org-re-reveal--parse-listoption (info option)
   "Parse and return OPTION in INFO.
@@ -1151,29 +1035,12 @@ Reveal.addEventListener( 'slidechanged', function( event ) {
 </script>\n" (plist-get info :reveal-klipse-js-url))
     ""))
 
-
-(defun org-re-reveal--highlight-css-path (info)
-  "Return location of CSS for highlight plugin with INFO."
-  (let ((highlight-css (plist-get info :reveal-highlight-css))
-        (version (plist-get info :reveal-guessed-revealjs-version)))
-    (if (symbolp highlight-css)
-        (concat "%r/" (format "%s/%s.css"
-                              (if (version< version "4")
-                                  "lib/css"
-                                "plugin/highlight")
-                              highlight-css))
-      highlight-css)))
-
 (defun org-re-reveal-stylesheets (info)
   "Return HTML code for reveal stylesheets using INFO and `org-re-reveal-root'."
   (let* ((root-path (file-name-as-directory (plist-get info :reveal-root)))
-         (reveal-version (plist-get info :reveal-guessed-revealjs-version))
-         (css-path (file-name-as-directory
-                    (concat root-path (plist-get info :reveal-css-path))))
-         (theme-path (file-name-as-directory (concat css-path "theme")))
-         (reveal-css (concat css-path "reveal.css"))
+         (reveal-css (concat root-path "css/reveal.css"))
          (theme (plist-get info :reveal-theme))
-         (theme-css (concat theme-path theme ".css"))
+         (theme-css (concat root-path "css/theme/" theme ".css"))
          (extra-css (plist-get info :reveal-extra-css))
          (in-single-file (plist-get info :reveal-single-file)))
     (concat
@@ -1196,7 +1063,7 @@ Reveal.addEventListener( 'slidechanged', function( event ) {
      ;; Include CSS for highlight.js if necessary
      (if (org-re-reveal--using-highlight.js info)
          (format "<link rel=\"stylesheet\" href=\"%s\"/>\n"
-                 (format-spec (org-re-reveal--highlight-css-path info)
+                 (format-spec (plist-get info :reveal-highlight-css)
                               `((?r . ,(directory-file-name root-path)))))
        "")
 
@@ -1204,9 +1071,7 @@ Reveal.addEventListener( 'slidechanged', function( event ) {
      (org-re-reveal--klipsify-header info)
 
      ;; print-pdf
-     (if (or in-single-file
-             (version< "3.9" reveal-version))
-         ""
+     (if in-single-file ""
        (format "\n<!-- If the query includes 'print-pdf', include the PDF print sheet -->
 <script>
     if( window.location.search.match( /print-pdf/gi ) ) {
@@ -1259,53 +1124,15 @@ based on `org-re-reveal-external-plugins'."
 (defvar org-re-reveal-client-multiplex nil
   "Used to cause generation of client html file for multiplex.")
 
-(defun org-re-reveal--add-plugins (info)
-  "Retrieve configuration for plugins with reveal.js 4 and later with INFO.
-Parse keywords \"REVEAL_ADD_PLUGIN\" and return list of triples."
-  (let ((additional (split-string
-                     (or (plist-get info :reveal-add-plugin) "") "\n" t " ")))
-    (mapcar (lambda (line)
-              (split-string line " " t " "))
-            additional)))
-
-(defun org-re-reveal--plugin-config (plugin info)
-  "Retrieve configuration for PLUGIN with reveal.js 4 and later with INFO.
-This retrieves the triple for PLUGIN from `org-re-reveal-plugin-config'
-or after keyword \"REVEAL_ADD_PLUGIN\"."
-  (assoc plugin (append org-re-reveal-plugin-config (org-re-reveal--add-plugins info))))
-
-(defun org-re-reveal--enabled-plugins (info)
-  "Return enabled plugins with INFO.
-Plugins can be enabled with keywords \"REVEAL_PLUGINS\" and
-\"REVEAL_ADD_PLUGIN\"."
-  (append
-   (org-re-reveal--parse-listoption info :reveal-plugins)
-   (mapcar (lambda (triple) (nth 0 triple))
-           (org-re-reveal--add-plugins info))))
-
 (defun org-re-reveal-scripts--libraries (info)
   "Internal function to generate script tags with INFO.
-This includes reveal.js libraries in `:reveal-script-files' under
+This includes reveal.js libraries in `org-re-reveal-script-files' under
 `org-re-reveal-root', and libraries in `org-re-reveal-extra-scripts'."
   (let* ((root-path (file-name-as-directory (plist-get info :reveal-root)))
          (script-files (org-re-reveal--parse-listoption
                         info :reveal-script-files))
          (root-libs (mapcar (lambda (file) (concat root-path file))
                             script-files))
-         (reveal-version (plist-get info :reveal-guessed-revealjs-version))
-         (in-single-file (plist-get info :reveal-single-file))
-         ;; Plugin config for reveal.js 4.x
-         (enabled-plugins
-          (when (and (not in-single-file)
-                     (version< "3.9" reveal-version))
-            ;; Multiplex is no builtin in 4.x.
-            (cl-remove 'multiplex (org-re-reveal--enabled-plugins info))))
-         (plugin-libs
-          (mapcar
-           (lambda (plugin)
-             (concat root-path
-                     (nth 2 (org-re-reveal--plugin-config plugin info))))
-           enabled-plugins))
          (extra-scripts (org-re-reveal--parse-listoption
                          info :reveal-extra-scripts))
          ;; Treat extra scripts not starting with <script> as filenames.
@@ -1315,14 +1142,14 @@ This includes reveal.js libraries in `:reveal-script-files' under
          ;; Treat extra scripts starting with <script> as elements.
          (extra-script-elements
           (cl-remove-if-not (lambda (s) (string-prefix-p "<script>" s))
-                            extra-scripts)))
+                            extra-scripts))
+         (in-single-file (plist-get info :reveal-single-file)))
     (concat
      (if in-single-file
          (let* ((local-root-path (org-re-reveal--file-url-to-path root-path))
                 (local-libs (append (mapcar (lambda (file)
                                               (concat local-root-path file))
                                             script-files)
-                                    plugin-libs
                                     extra-script-files))
                 (local-libs-exist-p (cl-every #'file-readable-p local-libs)))
            (if local-libs-exist-p
@@ -1332,14 +1159,14 @@ This includes reveal.js libraries in `:reveal-script-files' under
                                     (org-re-reveal--read-file file)))
                           local-libs "")
              (org-re-reveal--abort-with-message-box
-              "Subsequently listed libraries not readable for single-file embedding.  %s"
+              "Subsequently listed libraries not readable for single-file embedding.  Maybe customize `org-re-reveal-script-files'?  %s"
               (mapconcat 'identity
                          (cl-remove-if #'file-readable-p local-libs)
                          ", "))))
        ;; Embed script files with src.
        (mapconcat (lambda (file)
                     (concat "<script src=\"" file "\"></script>\n"))
-                  (append root-libs plugin-libs extra-script-files) ""))
+                  (append root-libs extra-script-files) ""))
      ;; Embed script tags.
      (mapconcat 'identity extra-script-elements "\n")
      (if extra-script-elements "\n" ""))))
@@ -1416,36 +1243,22 @@ Otherwise, raise error."
    (let ((max-scale (string-to-number (plist-get info :reveal-max-scale))))
      (if (> max-scale 0) (format "maxScale: %.2f,\n" max-scale) ""))
 
-   ;; themes and transitions
-   (let ((reveal-version (plist-get info :reveal-guessed-revealjs-version)))
-     (format (if (version< reveal-version "4")
-                 "
+   ;; thems and transitions
+   (format "
 theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
 transition: Reveal.getQueryHash().transition || '%s', // see README of reveal.js for options
 transitionSpeed: '%s',\n"
-               "
-transition: '%s',
-transitionSpeed: '%s',\n")
            (plist-get info :reveal-trans)
-           (plist-get info :reveal-speed)))
+           (plist-get info :reveal-speed))
 
-   ;; notes in PDF export
-   (let ((export-notes (plist-get info :reveal-export-notes-to-pdf)))
-    (if export-notes
-        (format "showNotes: window.location.search.match( /print-pdf/gi ) ? %s : false,\n"
-                (if (booleanp export-notes)
-                    "true"
-                  (format "'%s'" export-notes)))
-      ""))
-
-   ;; extra options
    (let ((options (plist-get info :reveal-extra-options)))
      (org-re-reveal--if-format "%s,\n" options))))
 
 (defun org-re-reveal-scripts--multiplex (info)
   "Internal function for `org-re-reveal-scripts' with INFO."
-  (let ((enabled-plugins (org-re-reveal--enabled-plugins info)))
-    (when (memq 'multiplex enabled-plugins)
+  (let ((enabled-builtin-plugins
+         (org-re-reveal--parse-listoption info :reveal-plugins)))
+    (when (memq 'multiplex enabled-builtin-plugins)
       (format
        "multiplex: {
     secret: %s, // null if client
@@ -1462,34 +1275,18 @@ transitionSpeed: '%s',\n")
   "Internal function for `org-re-reveal-scripts' with INFO."
   (let* ((root-path (file-name-as-directory (plist-get info :reveal-root)))
          (in-single-file (plist-get info :reveal-single-file))
-         (reveal-version (plist-get info :reveal-guessed-revealjs-version))
-         (enabled-plugins (org-re-reveal--enabled-plugins info)))
+         (enabled-builtin-plugins (org-re-reveal--parse-listoption
+                                   info :reveal-plugins)))
     ;; optional JS library heading
     (if in-single-file ""
       (concat
-       (if (version< reveal-version "4")
-           ""
-         (format "\n// Plugins with reveal.js 4.x
-plugins: [ %s ],\n"
-                 (mapconcat
-                  (lambda (plugin)
-                    (nth 1 (org-re-reveal--plugin-config plugin info)))
-                  enabled-plugins
-                  ", ")))
-       "\n// Optional libraries used to extend reveal.js
-dependencies: [\n"
+       "
+// Optional libraries used to extend reveal.js
+dependencies: [
+"
        ;; JS libraries
        (let* ((highlight-url (plist-get info :reveal-highlight-url))
-              (builtin-multiplex (format " { src: '%s', async: true },\n%s"
-                                         (plist-get info :reveal-multiplex-socketio-url)
-                                         ;; following ensures that either client.js or master.js is included depending on defvar org-re-reveal-client-multiplex value state
-                                         (if (not org-re-reveal-client-multiplex)
-                                             (progn
-                                               (if (not (string= "" (plist-get info :reveal-multiplex-secret)))
-                                                   (setq org-re-reveal-client-multiplex t))
-                                               (format " { src: '%splugin/multiplex/master.js', async: true }" root-path))
-                                           (format " { src: '%splugin/multiplex/client.js', async: true }" root-path))))
-              (builtins-v3
+              (builtins
                `(classList ,(format " { src: '%slib/js/classList.js', condition: function() { return !document.body.classList; } }" root-path)
                            markdown ,(format " { src: '%splugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
  { src: '%splugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } }" root-path root-path)
@@ -1500,21 +1297,26 @@ dependencies: [\n"
                            notes ,(format " { src: '%splugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }" root-path)
                            search ,(format " { src: '%splugin/search/search.js', async: true, condition: function() { return !!document.body.classList; } }" root-path)
                            remotes ,(format " { src: '%splugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } }" root-path)
-                           multiplex ,builtin-multiplex))
+                           multiplex ,(format " { src: '%s', async: true },\n%s"
+                                              (plist-get info :reveal-multiplex-socketio-url)
+                                              ;; following ensures that either client.js or master.js is included depending on defvar org-re-reveal-client-multiplex value state
+                                              (if (not org-re-reveal-client-multiplex)
+                                                  (progn
+                                                    (if (not (string= "" (plist-get info :reveal-multiplex-secret)))
+                                                        (setq org-re-reveal-client-multiplex t))
+                                                    (format " { src: '%splugin/multiplex/master.js', async: true }" root-path))
+                                                (format " { src: '%splugin/multiplex/client.js', async: true }" root-path)))))
               (builtin-codes
-               (if (version< reveal-version "4")
-                   (mapcar (lambda (p) (plist-get builtins-v3 p))
-                           enabled-plugins)
-                 ;; Multiplex plugin is a dependency with version 4.x
-                 (when (memq 'multiplex enabled-plugins)
-                   (list builtin-multiplex))))
+               (mapcar (lambda (p) (plist-get builtins p)) enabled-builtin-plugins))
               (external-plugins
                (org-re-reveal--external-plugin-init info root-path))
-              (all-plugins
-               (if external-plugins
-                   (append external-plugins builtin-codes)
-                 builtin-codes)))
-         (mapconcat 'identity all-plugins ",\n"))
+              (all-plugins (if external-plugins (append external-plugins builtin-codes) builtin-codes))
+              (extra-codes (plist-get info :reveal-extra-js))
+              (total-codes
+               (if (string= "" extra-codes)
+                   all-plugins
+                 (append (list extra-codes) all-plugins))))
+         (mapconcat 'identity total-codes ",\n"))
        "]\n\n"))))
 
 (defun org-re-reveal-scripts--init-script (info)
@@ -1796,17 +1598,6 @@ such links are assumed to point into other presentations."
      (concat "<a href=\"#" org-re-reveal--href-fragment-prefix)
      link)))
 
-(defun org-re-reveal--add-class (elem class)
-  "Add CLASS to the class attribute of ELEM.
-Merge CLASS with any previous classes in the :attr_html :class attribute"
-  (let* ((attrs (org-export-read-attribute :attr_html elem))
-         (oldclass (plist-get attrs :class))
-         (newclass (if oldclass (concat class " " oldclass) class))
-         (newattrs (mapconcat (lambda (elem) (format "%s" elem))
-                              (plist-put attrs :class newclass)
-                              " ")))
-    (org-element-put-property elem :attr_html (list newattrs))))
-
 (defun org-re-reveal--internal-link-class (link info)
   "Check if LINK is internal, given INFO, and maybe assign class.
 The direction of the link is assigned as class attribute to the link
@@ -1824,9 +1615,17 @@ requires a version of org-mode as of 2018-12-08 or newer."
              (direction (if (< tbegin lbegin)
                             "backwardlink"
                           "forwardlink"))
-             (parent (org-export-get-parent-element link)))
-        (org-re-reveal--add-class parent direction)
-        (org-re-reveal--add-class link direction)))))
+             (parent (org-export-get-parent-element link))
+             (attrs (org-combine-plists
+                     (org-export-read-attribute :attr_html parent)
+                     (org-export-read-attribute :attr_html link)))
+             (class (plist-get attrs :class))
+             (newclass (if class (concat direction " " class) direction))
+             (newattrs (mapconcat (lambda (elem) (format "%s" elem))
+                                  (plist-put attrs :class newclass)
+                                  " ")))
+        (org-element-put-property parent :attr_html (list newattrs))
+        (org-element-put-property link :attr_html (list newattrs))))))
 
 (defun org-re-reveal-link (link desc info)
   "Transcode a LINK object with DESC and INFO from Org to Reveal.
@@ -1884,31 +1683,23 @@ Extract and set `attr_html' to plain-list tag attributes."
 (defun org-re-reveal-format-spec (info)
   "Return format specification with INFO.
 Formatting extends `org-html-format-spec' such that
-%-sequences for `org-re-reveal-title-slide' are available.
-Speaker notes on the title slide with \"%n\" make use of
-`org-re-reveal-notes-format-string'."
-  (let* ((notes (org-re-reveal--read-file-as-string
-                 (plist-get info :reveal-title-slide-notes)))
-         (html-notes (when notes
-                       (org-export-string-as notes 're-reveal t))))
-    (append (org-html-format-spec info)
-            `((?A . ,(org-export-data
-                      (plist-get info :reveal-academic-title) info))
-              (?m . ,(org-export-data
-                      (plist-get info :reveal-miscinfo) info))
-              (?n . ,(org-re-reveal--if-format
-                      org-re-reveal-notes-format-string html-notes))
-              (?q . ,(url-encode-url
-                      (org-export-data
-                       (plist-get info :reveal-talk-qr-code) info)))
-              (?u . ,(url-encode-url
-                      (org-export-data
-                       (plist-get info :reveal-talk-url) info)))))))
+%-sequences for `org-re-reveal-title-slide' are available."
+  (append (org-html-format-spec info)
+          `((?A . ,(org-export-data
+                    (plist-get info :reveal-academic-title) info))
+            (?m . ,(org-export-data
+                    (plist-get info :reveal-miscinfo) info))
+            (?q . ,(url-encode-url
+                    (org-export-data
+                     (plist-get info :reveal-talk-qr-code) info)))
+            (?u . ,(url-encode-url
+                    (org-export-data
+                     (plist-get info :reveal-talk-url) info))))))
 
-(defun org-re-reveal--build-pre-postamble (type info spec)
-  "Depending on TYPE, return preamble or postamble or nil.
-Use plist INFO and format specification SPEC."
-  (let ((section (plist-get info (intern (format ":reveal-%s" type)))))
+(defun org-re-reveal--build-pre-postamble (type info)
+  "Depending on TYPE, return preamble or postamble for INFO as string, or nil."
+  (let ((section (plist-get info (intern (format ":reveal-%s" type))))
+        (spec (org-re-reveal-format-spec info)))
     (when section
       (let ((section-contents
              (if (functionp (intern section)) (funcall (intern section) info)
@@ -1928,9 +1719,12 @@ holding contextual information."
 
 (defun org-re-reveal--using-highlight.js (info)
   "Check with INFO whether highlight.js plugin is enabled."
-  (let ((reveal-plugins
-         (org-re-reveal--enabled-plugins info)))
-    (memq 'highlight reveal-plugins)))
+  (let ((reveal-plugins (condition-case nil
+                            (car (read-from-string (plist-get info :reveal-plugins)))
+                          (end-of-file nil)
+                          (wrong-type-argument nil))))
+    (memq 'highlight (or (and reveal-plugins (listp reveal-plugins) reveal-plugins)
+                         org-re-reveal-plugins))))
 
 (defun org-re-reveal--buffer-substring-html-escape (start end)
   "Convert buffer substring characters from plain text to HTML equivalent.
@@ -1956,6 +1750,8 @@ INFO is a plist holding contextual information.  CONTENTS is unused."
                                'org-html-htmlize-region-for-paste)
                               #'org-re-reveal--buffer-substring-html-escape))
                      (org-html-format-code src-block info))))
+           (frag (org-export-read-attribute :attr_reveal src-block :frag))
+           (findex (org-export-read-attribute :attr_reveal src-block :frag_idx))
            (code-attribs (or (org-export-read-attribute
                               :attr_reveal src-block :code_attribs) ""))
            (label (let ((lbl (org-element-property :name src-block)))
@@ -1966,59 +1762,66 @@ INFO is a plist holding contextual information.  CONTENTS is unused."
            (klipsify (and (member lang (mapcar #'car klipse-setup))
                           (plist-get info :reveal-klipsify-src)
                           (not (org-export-read-attribute
-                                :attr_reveal src-block
-                                :no-klipsify)))))
-      (let* ((attr-html (org-export-read-attribute :attr_html src-block))
-             (attr-string (if attr-html
-                              (concat
-                               " " (org-html--make-attribute-string attr-html))
-                            ""))
-             (pre-class (if (or klipsify use-highlight)
-                            ;; With klipsify and highlight.js, lang is
-                            ;; part of code tag.  Do not repeat on pre tag.
-                            ""
-                          (if lang
-                              (format " class=\"src src-%s\"" lang)
-                            " class=\"example\"")))
-             (pre-tag (format "<pre%s%s>"
-                              (if attr-html attr-string pre-class)
-                              label)))
-        (if (not lang)
-            (format "%s\n%s</pre>" pre-tag code)
-          (if klipsify
-              (let* ((triple (assoc lang klipse-setup))
-                     (selectorclass (nth 2 triple)))
-                (concat
-                 (format "%s<code class=\"%s\" %s>\n"
-                         pre-tag selectorclass code-attribs)
-                 (if (string= lang "html")
+                                :attr_reveal src-block :no-klipsify)))))
+      (if (not lang)
+          (format "<pre %s%s>\n%s</pre>"
+                  (or (org-re-reveal--frag-class frag info) " class=\"example\"")
+                  label
+                  code)
+        (if klipsify
+            (let* ((triple (assoc lang klipse-setup))
+                   (selectorclass (nth 2 triple)))
+              (concat
+               "<pre><code class=\"" selectorclass "\" " code-attribs ">\n"
+               (if (string= lang "html")
+                   (replace-regexp-in-string
+                    "'" "&#39;"
+                    (replace-regexp-in-string
+                     "<" "&lt;"
                      (replace-regexp-in-string
-                      "'" "&#39;"
+                      ">" "&gt;"
                       (replace-regexp-in-string
-                       "<" "&lt;"
-                       (replace-regexp-in-string
-                        ">" "&gt;"
-                        (replace-regexp-in-string
-                         "&" "&amp;"
-                         (cl-letf (((symbol-function
-                                     'org-html-htmlize-region-for-paste)
-                                    #'buffer-substring))
-                           (org-html-format-code src-block info))))))
-                   (replace-regexp-in-string "'" "&#39;" code))
-                 "</code></pre>\n"))
-            (format
-             "<div class=\"org-src-container\">\n%s%s\n</div>"
-             (if (not caption) ""
-               (format "<label class=\"org-src-name\">%s</label>"
-                       (org-export-data caption info)))
-             (if use-highlight
-                 (format "\n%s<code class=\"%s\" %s>%s</code></pre>"
-                         pre-tag lang code-attribs code)
-               (format "\n%s%s</pre>" pre-tag code)))))))))
+                       "&" "&amp;"
+                       (cl-letf (((symbol-function
+                                   'org-html-htmlize-region-for-paste)
+                                  #'buffer-substring))
+                         (org-html-format-code src-block info))))))
+                 (replace-regexp-in-string "'" "&#39;" code))
+               "</code></pre>\n"))
+          (format
+           "<div class=\"org-src-container\">\n%s%s\n</div>"
+           (if (not caption) ""
+             (format "<label class=\"org-src-name\">%s</label>"
+                     (org-export-data caption info)))
+           (if use-highlight
+               (format "\n<pre%s%s><code class=\"%s %s\" %s>%s</code></pre>"
+                       (or (org-re-reveal--frag-class frag info) "")
+                       (or (org-re-reveal--frag-index findex) "")
+                       label lang code-attribs code)
+             (format "\n<pre %s%s%s>%s</pre>"
+                     (or (org-re-reveal--frag-class frag info)
+                         (format " class=\"src src-%s\"" lang))
+                     (or (org-re-reveal--frag-index findex) "")
+                     label code))))))))
 
-(defun org-re-reveal--auto-title-slide-template (info spec)
-  "Generate the automatic title slide template with INFO and SPEC."
-  (let* ((title (org-export-data (plist-get info :title) info))
+(defun org-re-reveal-quote-block (quote-block contents info)
+  "Transcode a QUOTE-BLOCK element from Org to Reveal.
+CONTENTS holds the contents of the block INFO is a plist holding
+contextual information."
+  (format "<blockquote%s>\n%s</blockquote>"
+          (let ((frag (org-re-reveal--frag-class
+                       (org-export-read-attribute
+                        :attr_reveal quote-block :frag) info)))
+            (if frag
+                (concat " " frag)
+              ""))
+          contents))
+
+
+(defun org-re-reveal--auto-title-slide-template (info)
+  "Generate the automatic title slide template with INFO."
+  (let* ((spec (org-re-reveal-format-spec info))
+         (title (org-export-data (plist-get info :title) info))
          (author (cdr (assq ?a spec)))
          (email (cdr (assq ?e spec)))
          (date (cdr (assq ?d spec))))
@@ -2060,87 +1863,85 @@ INFO is a plist holding contextual information.  CONTENTS is unused."
   "Return complete document string after HTML conversion.
 CONTENTS is the transcoded contents string.
 INFO is a plist holding export options."
-  (let ((spec (org-re-reveal-format-spec info)))
-    (org-re-reveal--check-single-file info)
-    (org-re-reveal--setup-paths info)
-    (concat
-     (format "<!DOCTYPE html>\n<html%s>\n<head>\n"
-             (org-re-reveal--if-format " lang=\"%s\"" (plist-get info :language)))
-     "<meta charset=\"utf-8\"/>\n"
-     (org-re-reveal--if-format "<title>%s</title>\n"
-                               (org-export-data (plist-get info :title) info))
-     (org-re-reveal--if-format "<meta name=\"author\" content=\"%s\"/>\n"
-                               (org-element-interpret-data (plist-get info :author)))
-     (org-re-reveal--if-format "<meta name=\"description\" content=\"%s\"/>\n"
-                               (plist-get info :description))
-     (org-re-reveal--if-format "<meta name=\"keywords\" content=\"%s\"/>\n"
-                               (plist-get info :keywords))
-     (org-re-reveal-stylesheets info)
-     (org-re-reveal--build-pre-postamble 'head-preamble info spec)
-     (org-re-reveal-mathjax-scripts info)
-     (org-element-normalize-string (plist-get info :html-head))
-     (org-element-normalize-string (plist-get info :html-head-extra))
-     "</head>\n<body"
-     (org-re-reveal--if-format " %s" org-re-reveal-body-attrs)
-     ">\n"
-     (org-re-reveal--build-pre-postamble 'preamble info spec)
-     "<div class=\"reveal\">
+  (org-re-reveal--check-single-file info)
+  (concat
+   (format "<!DOCTYPE html>\n<html%s>\n<head>\n"
+           (org-re-reveal--if-format " lang=\"%s\"" (plist-get info :language)))
+   "<meta charset=\"utf-8\"/>\n"
+   (org-re-reveal--if-format "<title>%s</title>\n"
+                             (org-export-data (plist-get info :title) info))
+   (org-re-reveal--if-format "<meta name=\"author\" content=\"%s\"/>\n"
+                             (org-element-interpret-data (plist-get info :author)))
+   (org-re-reveal--if-format "<meta name=\"description\" content=\"%s\"/>\n"
+                             (plist-get info :description))
+   (org-re-reveal--if-format "<meta name=\"keywords\" content=\"%s\"/>\n"
+                             (plist-get info :keywords))
+   (org-re-reveal-stylesheets info)
+   (org-re-reveal-mathjax-scripts info)
+   (org-re-reveal--build-pre-postamble 'head-preamble info)
+   (org-element-normalize-string (plist-get info :html-head))
+   (org-element-normalize-string (plist-get info :html-head-extra))
+   "</head>\n<body"
+   (org-re-reveal--if-format " %s" org-re-reveal-body-attrs)
+   ">\n"
+   (org-re-reveal--build-pre-postamble 'preamble info)
+   "<div class=\"reveal\">
 <div class=\"slides\">\n"
-     ;; Title slides
-     (let ((title-slide (plist-get info :reveal-title-slide)))
-       (when (and (or (eq 'auto title-slide)
-                      (and (stringp title-slide) (< 0 (length title-slide))))
-                  (or (not (plist-get info :reveal-subtree))
-                      (plist-get info :reveal-subtree-with-title-slide)))
-         (let ((title-slide-background (plist-get info :reveal-title-slide-background))
-               (title-slide-background-size (plist-get info :reveal-title-slide-background-size))
-               (title-slide-background-position (plist-get info :reveal-title-slide-background-position))
-               (title-slide-background-repeat (plist-get info :reveal-title-slide-background-repeat))
-               (title-slide-background-transition (plist-get info :reveal-title-slide-background-transition))
-               (title-slide-state (plist-get info :reveal-title-slide-state))
-               (title-slide-timing (plist-get info :reveal-title-slide-timing))
-               (title-slide-with-header (plist-get info :reveal-slide-global-header))
-               (title-slide-with-footer (plist-get info :reveal-slide-global-footer)))
-           (concat "<section id=\"sec-title-slide\""
-                   (when title-slide-background
-                     (concat " data-background=\"" title-slide-background "\""))
-                   (when title-slide-background-size
-                     (concat " data-background-size=\"" title-slide-background-size "\""))
-                   (when title-slide-background-position
-                     (concat " data-background-position=\"" title-slide-background-position "\""))
-                   (when title-slide-background-repeat
-                     (concat " data-background-repeat=\"" title-slide-background-repeat "\""))
-                   (when title-slide-background-transition
-                     (concat " data-background-transition=\"" title-slide-background-transition "\""))
-                   (when title-slide-state
-                     (concat " data-state=\"" title-slide-state "\""))
-                   (when title-slide-timing
-                     (concat " data-timing=\"" title-slide-timing "\""))
-                   ">\n"
-                   (when title-slide-with-header
-                     (let ((header (plist-get info :reveal-slide-header)))
-                       (when header (format org-re-reveal-slide-header-html header))))
-                   (cond ((eq title-slide nil) nil)
-                         ((stringp title-slide)
-                          (let* ((file-contents
-                                  (org-re-reveal--read-file-as-string title-slide))
-                                 (title-string (or file-contents title-slide)))
-                            (format-spec title-string spec)))
-                         ((eq title-slide 'auto)
-                          (org-re-reveal--auto-title-slide-template info spec)))
-                   "\n"
-                   (when title-slide-with-footer
-                     (let ((footer (plist-get info :reveal-slide-footer)))
-                       (when footer (format org-re-reveal-slide-footer-html footer))))
-                   "</section>\n"))))
-     contents
-     "</div>
+   ;; Title slides
+   (let ((title-slide (plist-get info :reveal-title-slide)))
+     (when (and (or (eq 'auto title-slide)
+                    (and (stringp title-slide) (< 0 (length title-slide))))
+                (or (not (plist-get info :reveal-subtree))
+                    (plist-get info :reveal-subtree-with-title-slide)))
+       (let ((title-slide-background (plist-get info :reveal-title-slide-background))
+             (title-slide-background-size (plist-get info :reveal-title-slide-background-size))
+             (title-slide-background-position (plist-get info :reveal-title-slide-background-position))
+             (title-slide-background-repeat (plist-get info :reveal-title-slide-background-repeat))
+             (title-slide-background-transition (plist-get info :reveal-title-slide-background-transition))
+             (title-slide-state (plist-get info :reveal-title-slide-state))
+             (title-slide-timing (plist-get info :reveal-title-slide-timing))
+             (title-slide-with-header (plist-get info :reveal-slide-global-header))
+             (title-slide-with-footer (plist-get info :reveal-slide-global-footer)))
+         (concat "<section id=\"sec-title-slide\""
+                 (when title-slide-background
+                   (concat " data-background=\"" title-slide-background "\""))
+                 (when title-slide-background-size
+                   (concat " data-background-size=\"" title-slide-background-size "\""))
+                 (when title-slide-background-position
+                   (concat " data-background-position=\"" title-slide-background-position "\""))
+                 (when title-slide-background-repeat
+                   (concat " data-background-repeat=\"" title-slide-background-repeat "\""))
+                 (when title-slide-background-transition
+                   (concat " data-background-transition=\"" title-slide-background-transition "\""))
+                 (when title-slide-state
+                   (concat " data-state=\"" title-slide-state "\""))
+                 (when title-slide-timing
+                   (concat " data-timing=\"" title-slide-timing "\""))
+                 ">\n"
+                 (when title-slide-with-header
+                   (let ((header (plist-get info :reveal-slide-header)))
+                     (when header (format org-re-reveal-slide-header-html header))))
+                 (cond ((eq title-slide nil) nil)
+                       ((stringp title-slide)
+                        (let* ((file-contents
+                                (org-re-reveal--read-file-as-string title-slide))
+                               (title-string (or file-contents title-slide)))
+                          (format-spec title-string
+                                       (org-re-reveal-format-spec info))))
+                       ((eq title-slide 'auto) (org-re-reveal--auto-title-slide-template info)))
+                 "\n"
+                 (when title-slide-with-footer
+                   (let ((footer (plist-get info :reveal-slide-footer)))
+                     (when footer (format org-re-reveal-slide-footer-html footer))))
+                 "</section>\n"))))
+   contents
+   "</div>
 </div>\n"
-     (org-re-reveal--build-pre-postamble 'postamble info spec)
-     (org-re-reveal-scripts info)
-     (org-re-reveal--klipsify-script info)
-     "</body>
-</html>\n")))
+   (org-re-reveal--build-pre-postamble 'postamble info)
+   (org-re-reveal-scripts info)
+   (org-re-reveal--klipsify-script info)
+   "</body>
+</html>\n"))
 
 (defun org-re-reveal-filter-parse-tree (tree backend info)
   "Do filtering before parsing TREE.
@@ -2177,15 +1978,13 @@ section headings that do not have one already."
 FRAG is the fragment style, a DEFAULT-STYLE may be used;
 optional FRAG-INDEX and FRAG-AUDIO may indicate fragment positions
 and audio files."
-  (when (and frag (not (string= frag "none")))
-    (org-re-reveal--add-class
-     elem
-     (if (string= frag t)
-         (if default-style
-             (format "fragment %s" default-style)
-           "fragment")
-       (format "fragment %s" frag)))
-    (let ((attr-html (org-element-property :attr_html elem)))
+  (let ((attr-html (org-element-property :attr_html elem)))
+    (when (and frag (not (string= frag "none")))
+      (push (if (string= frag t)
+                (if default-style (format ":class fragment %s" default-style)
+                  ":class fragment")
+              (format ":class fragment %s" frag))
+            attr-html)
       (when frag-index
         ;; Index positions should be numbers or the minus sign.
         (cl-assert (or (integerp frag-index)
@@ -2196,8 +1995,8 @@ and audio files."
                    nil "Index cannot be a list: %s" frag-index)
         (push (format ":data-fragment-index %s" frag-index) attr-html))
       (when (and frag-audio (not (string= frag-audio "none")))
-        (push (format ":data-audio-src %s" frag-audio) attr-html))
-      (org-element-put-property elem :attr_html attr-html))))
+        (push (format ":data-audio-src %s" frag-audio) attr-html)))
+    (org-element-put-property elem :attr_html attr-html)))
 
 (defun org-re-reveal-append-frag (elem default-style)
   "Append transformed fragment from ELEM with DEFAULT-STYLE.
@@ -2266,9 +2065,8 @@ Optional BACKEND must be `re-reveal' or a backend derived from it."
   (interactive)
   (let* ((backend (or backend 're-reveal))
          (extension (concat "." org-html-extension))
-         (client-ext (concat org-re-reveal-multiplex-client-ext extension))
          (file (org-export-output-file-name extension subtreep))
-         (clientfile (org-export-output-file-name client-ext subtreep))
+         (clientfile (org-export-output-file-name (concat "_client" extension) subtreep))
          (org-html-container-element "div"))
 
     (setq org-re-reveal-client-multiplex nil)
@@ -2315,11 +2113,9 @@ is the property list for the given project.  PUB-DIR is the
 publishing directory.  Optional BACKEND may specify a derived export
 backend.
 Return output file name."
-  (let ((org-re-reveal-client-multiplex nil)
-        (org-html-container-element "div"))
+  (let ((org-re-reveal-client-multiplex nil))
     (org-publish-org-to
-     (or backend 're-reveal) filename
-     (concat "." org-html-extension) plist pub-dir)))
+     (or backend 're-reveal) filename ".html" plist pub-dir)))
 
 ;;;###autoload
 (defun org-re-reveal-publish-to-reveal-client
@@ -2334,11 +2130,9 @@ expression to only publish FILENAME if it matches this regular expression.
 Return output file name."
   (if (or (not org-re-reveal-client-multiplex-filter)
           (string-match org-re-reveal-client-multiplex-filter filename))
-      (let ((org-re-reveal-client-multiplex t)
-            (client-ext (concat org-re-reveal-multiplex-client-ext
-                                "." org-html-extension)))
+      (let ((org-re-reveal-client-multiplex t))
         (org-publish-org-to
-         (or backend 're-reveal) filename client-ext plist pub-dir))
+         (or backend 're-reveal) filename "_client.html" plist pub-dir))
     (message "File '%s' not published (not matched by '%s')."
              filename org-re-reveal-client-multiplex-filter)
     nil)
