@@ -20,7 +20,9 @@
   (setq user-full-name "David Larsson")
   (setq user-mail-address "david.larsson@selfhosted.xyz")
   ;; Assuming the Guix checkout is in ~/src/guix.
-  (load-file "~/src/guix/etc/copyright.el")
+  (if (file-exists-p "~/src/guix/etc/copyright.el")
+      (load-file "~/src/guix/etc/copyright.el"))
+  ;;(load-file "~/src/guix/etc/copyright.el")
 #+END_SRC
 
 * Guix
