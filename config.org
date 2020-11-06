@@ -845,6 +845,7 @@ The '(prin1-to-string org-my-aNumber) in the table formula evaluates
 the lisp form (prin1-to-string org-my-aNumber) in the same way as in
 the previous paragraph.
 
+
 ** Key-bindings
 
 The kbd version below is because the \C-cl version doesn't work.
@@ -989,8 +990,8 @@ Org-Mode agenda
 Org-mode contacts
 
 #+BEGIN_SRC emacs-lisp
-  (require 'org-contacts)
-  (setq org-contacts-files '("~/org/contacts.org" "~/org/other_contacts.org"))
+  ;;(require 'org-contacts)
+  ;;(setq org-contacts-files '("~/org/contacts.org"))
   ;; (add-to-list 'org-capture-templates
   ;; '("c" "Contacts" entry (file "~/org/contacts.org")
   ;;   "* %(org-contacts-template-name)
@@ -1023,6 +1024,12 @@ Clock in with =C-c C-x C-i= and clock out with =C-c C-x C-o=.
 #+END_SRC
 
 ** Babel
+
+*** org-src indentation
+
+#+begin_src emacs-lisp
+(setq org-src-preserve-indentation t)
+#+end_src
 
 *** Languages
 
@@ -1199,6 +1206,8 @@ for specific lisp Implementation
 #+begin_src emacs-lisp
 ;;(setq org-src-preserve-indentation t)
 #+end_src
+
+
 
 * Presentation
 
