@@ -1,0 +1,112 @@
+# -*- mode: snippet -*-
+# expand-env: ((yas-after-exit-snippet-hook #'org-align-all-tags) (yas-indent-line 'fixed) (yas-wrap-around-region 'auto))
+# name: <pyapp
+# key: <pyapp
+# --
+#+PROPERTY: header-args:python :shebang "#!/usr/bin/env python3" :eval no-export :noweb no-export :mkdirp yes
+#+PROPERTY: header-args:jupyter-python :shebang "#!/usr/bin/env python3" :eval no-export :noweb no-export :mkdirp yes
+
+* TODO ${1:appname}
+
+The =__init__= thing
+
+#+BEGIN_SRC python :noweb-ref "" :tangle __init__.py
+#+END_SRC
+
+** ${2:modulename}
+
+The =__init__= thing
+
+#+BEGIN_SRC python :noweb-ref "" :tangle first_mod/__init__.py
+#+END_SRC
+
+*** ${3:submodulename}
+
+The module path:
+
+#+BEGIN_SRC python :noweb-ref "" :session $3.lib
+# default_exp $2.$3
+#+END_SRC
+
+Imports:
+
+#+BEGIN_SRC python :noweb-ref "" :session $3.lib :tangle $2/$3.py
+# exports
+"""Submod Doc-String"""
+#<<$2.$3.imports>>#
+#+END_SRC
+
+The collected classes, functions and tests in the library:
+
+#+BEGIN_SRC python :noweb-ref "" :session $3 :tangle $2/$3.py
+#<<$2.$3.lib>>#
+#<<$2.$3.test>>#
+#+END_SRC
+
+The collected tests in a separate file:
+
+#+BEGIN_SRC python :noweb-ref "" :session $3 :tangle $2/test_$3.py
+from $1.$2.$3 import *
+#<<$2.$3.test>>#
+#+END_SRC
+
+The main code. We add pass in the pattern in case we don't
+create any main-code
+
+#+BEGIN_SRC python :noweb-ref "" :session submod :tangle $2/$3.py
+# exports
+def main():
+    pass
+    #<<$2.$3.main>>#
+#+END_SRC
+
+*** The Story of $3
+$0
+#+BEGIN_SRC python :noweb-ref "$2.$3.imports" :session $3
+# exports
+import os as os
+#+END_SRC
+
+#+BEGIN_SRC python :noweb-ref "$2.$3.lib" :session $3
+# exports
+def hello():
+    "hello() returns the string \"Hello, world!\""
+    return "Hello, world!"
+#+END_SRC
+
+#+BEGIN_SRC python :noweb-ref "#$2.$3.test" :session $3
+# exports
+def test_hello():
+    """Testing the hello function"""
+    assert hello() == "Hello, world!"
+#+END_SRC
+
+#+BEGIN_SRC python :noweb-ref "$2.$3.main" :session $3
+# exports
+print(hello())
+#+END_SRC
+
+*** Test Results for $3
+
+#+begin_src bash :session $3_test :results output
+pytest $2/test_$3.py
+#+end_src
+
+*** CLI Arguments to $3
+
+#+BEGIN_SRC python :noweb-ref "" :session $3 :tangle $2/$3.py
+# exports
+if __name__ == "__main__":
+    main()
+#+END_SRC
+
+* COMMENT babel settings
+  
+# Local Variables:
+# org-babel-noweb-wrap-start: "#<<"
+# org-babel-noweb-wrap-end: ">>#"
+# org-confirm-babel-evaluate: nil
+# org-src-preserve-indentation: t
+# org-my-foo: bar
+# org-my-aNumber: 32
+# End:
