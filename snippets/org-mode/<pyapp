@@ -5,100 +5,168 @@
 # --
 #+PROPERTY: header-args:python :shebang "#!/usr/bin/env python3" :eval no-export :noweb no-export :mkdirp yes
 #+PROPERTY: header-args:jupyter-python :shebang "#!/usr/bin/env python3" :eval no-export :noweb no-export :mkdirp yes
+#+PROPERTY: header-args:bash :shebang "#!/usr/bin/env bash" :eval no-export :noweb no-export :mkdirp yes
+#+OPTIONS: ^:{}
 
-* TODO ${1:appname}
-
-The =__init__= thing
+#+TITLE: ${1:appname}
+#+SUMMARY: This is the $1 app
 
 #+BEGIN_SRC python :noweb-ref "" :tangle __init__.py
 #+END_SRC
 
-** ${2:modulename}
+Below is the story of $1
+
+* utils
+
+[[https://stackoverflow.com/a/35710527/7612826][Reference]]
+
+#+BEGIN_SRC python :noweb-ref "" :tangle utils/__init__.py
+#+END_SRC
+
+** libutils
+
+When importing the export function from this module, we can use
+@export as decorator for functions we want included in ~__all__~.
+
+#+BEGIN_SRC python :noweb-ref "" :tangle utils/libutils.py :session $1
+# export utils.libutils
+import sys
+def export(fn):
+    mod = sys.modules[fn.__module__]
+    if hasattr(mod, '__all__'):
+        mod.__all__.append(fn.__name__)
+    else:
+        mod.__all__ = [fn.__name__]
+    return fn
+#+END_SRC
+
+* ${2:modulename} - Overview
 
 The =__init__= thing
 
-#+BEGIN_SRC python :noweb-ref "" :tangle first_mod/__init__.py
+#+BEGIN_SRC python :noweb-ref "" :tangle $2/__init__.py
 #+END_SRC
 
-*** ${3:submodulename}
+** ${3:submodulename} - API
 
-The module path:
+Imports in $3:
 
-#+BEGIN_SRC python :noweb-ref "" :session $3.lib
-# default_exp $2.$3
-#+END_SRC
-
-Imports:
-
-#+BEGIN_SRC python :noweb-ref "" :session $3.lib :tangle $2/$3.py
-# exports
+#+BEGIN_SRC python :noweb-ref "" :session $3 :tangle $2/$3.py
+# exports $2.$3
 """Submod Doc-String"""
+import sys, os, inspect
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0, currentdir)
 #<<$2.$3.imports>>#
 #+END_SRC
 
-The collected classes, functions and tests in the library:
+The collected classes, functions and global variables in the library:
 
 #+BEGIN_SRC python :noweb-ref "" :session $3 :tangle $2/$3.py
+# export $2.$3
+#<<$2.$3.globals>>#
 #<<$2.$3.lib>>#
-#<<$2.$3.test>>#
 #+END_SRC
 
-The collected tests in a separate file:
+The collected tests go in the $2.test_$3 module
 
 #+BEGIN_SRC python :noweb-ref "" :session $3 :tangle $2/test_$3.py
+# exporti $2.test_$3
+from $1.utils.libutils import export
 from $1.$2.$3 import *
 #<<$2.$3.test>>#
 #+END_SRC
 
-The main code. We add pass in the pattern in case we don't
-create any main-code
+The main code:
 
-#+BEGIN_SRC python :noweb-ref "" :session submod :tangle $2/$3.py
-# exports
-def main():
+#+BEGIN_SRC python :noweb-ref "" :session $3 :tangle $2/$3.py
+# exports $2.$3
+@export
+def main_$3():
     pass
     #<<$2.$3.main>>#
 #+END_SRC
 
-*** The Story of $3
+** $3 - Test Results
+
+#+begin_src python :session $3_test :results output :exports both
+import subprocess
+print(subprocess.check_output("pytest $2/test_$3.py", shell = True).decode("utf-8"))
+#+end_src
+
+** $3 - CLI Arguments
+
+#+BEGIN_SRC python :noweb-ref "" :session $3 :tangle $2/$3.py
+# exports $2.$3
+if __name__ == "__main__":
+    main_$3()
+#+END_SRC
+
+* Ch. 1 $2.$3
 $0
 #+BEGIN_SRC python :noweb-ref "$2.$3.imports" :session $3
-# exports
-import os as os
+# exports $2.$3
+from $1.utils.libutils import export
 #+END_SRC
 
 #+BEGIN_SRC python :noweb-ref "$2.$3.lib" :session $3
-# exports
-def hello():
-    "hello() returns the string \"Hello, world!\""
+# exports $2.$3
+@export
+def hello_$3():
+    "hello_$3() returns the string \\\"Hello, world!\\\""
     return "Hello, world!"
 #+END_SRC
 
-#+BEGIN_SRC python :noweb-ref "#$2.$3.test" :session $3
-# exports
-def test_hello():
-    """Testing the hello function"""
-    assert hello() == "Hello, world!"
+#+BEGIN_SRC python :noweb-ref "$2.$3.test" :session $3
+# exports $2.test_$3
+@export
+def test_hello_$3():
+    """hello_$3 must return the string \\\"Hello, world!\\\""""
+    assert hello_$3() == "Hello, world!"
 #+END_SRC
+
+In the main function we can now run:
 
 #+BEGIN_SRC python :noweb-ref "$2.$3.main" :session $3
-# exports
-print(hello())
+print(hello_$3())
 #+END_SRC
 
-*** Test Results for $3
+* $1 - Test Results
 
-#+begin_src bash :session $3_test :results output
-pytest $2/test_$3.py
+#+begin_src python :session $1_test :results output :exports both
+import subprocess
+print(subprocess.check_output("pytest .", shell = True).decode("utf-8"))
 #+end_src
 
-*** CLI Arguments to $3
+* Building docs
 
-#+BEGIN_SRC python :noweb-ref "" :session $3 :tangle $2/$3.py
-# exports
-if __name__ == "__main__":
-    main()
-#+END_SRC
+#+begin_src python :session myapp_docs :results output :exports both
+import subprocess
+libs_order = "utils_temp.ipynb libutils_temp.ipynb $2_temp.ipynb $3_temp.ipynb test_$3.ipynb $1_temp.ipynb"
+cmd = "cd ../../ && " + "_NBDEV_ORG_BABEL_ARGS=\"--build-libs-order " + libs_order + "\" nbdev_build_docs_from_org" + "; cd -"
+print(subprocess.check_output(cmd, shell = True).decode("utf-8"))
+#+end_src
+
+* Running $1
+
+#+begin_src bash :session run
+PYTHONPATH=$\(a=$\(pwd);echo "$\{a%/*}"):$PYTHONPATH python3 
+#+end_src
+
+Or in a guix virtualenv
+
+#+BEGIN_SRC bash :noweb-ref "" :tangle ../.guix-env
+# guix environment --pure --ad-hoc python "\${Reqs[@]/#/python-}" -- python3 -c 'import os; print(os.environ)'
+mapfile -t Reqs < <(grep -oP '(?<=\ )[a-zA-Z-_]+' <(grep -E '^requirements = ' ../settings.ini))
+guix environment --pure --ad-hoc python "\${Reqs[@]/#/python-}" -- python3
+#+end_src
+
+#+BEGIN_SRC bash :noweb-ref "" :tangle ../../.guix-env
+# guix environment --pure --ad-hoc python "\${Reqs[@]/#/python-}" -- python3 -c 'import os; print(os.environ)'
+mapfile -t Reqs < <(grep -oP '(?<=\ )[a-zA-Z-_]+' <(grep -E '^requirements = ' settings.ini))
+guix environment --pure --ad-hoc python "\${Reqs[@]/#/python-}" -- python3
+#+end_src
 
 * COMMENT babel settings
   
