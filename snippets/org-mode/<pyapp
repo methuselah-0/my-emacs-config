@@ -143,7 +143,7 @@ print(subprocess.check_output("pytest .", shell = True).decode("utf-8"))
 
 #+begin_src python :session $1_docs :results output :exports both
 import subprocess
-libs_order = "utils_temp.ipynb libutils_temp.ipynb $2_temp.ipynb $3_temp.ipynb test_$3.ipynb $1_temp.ipynb"
+libs_order = "utils_temp.ipynb libutils_temp.ipynb $2_temp.ipynb $3_temp.ipynb test_$3_temp.ipynb $1_temp.ipynb"
 cmd = "cd ../../ && " + "_NBDEV_ORG_BABEL_ARGS=\\\"--build-libs-order " + libs_order + "\\\" nbdev_build_docs_from_org" + "; cd -"
 print(subprocess.check_output(cmd, shell = True).decode("utf-8"))
 #+end_src
