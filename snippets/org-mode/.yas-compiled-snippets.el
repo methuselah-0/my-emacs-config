@@ -4,6 +4,7 @@
 (yas-define-snippets 'org-mode
 		     '(("<w" "#+begin_warning\n$0\n#+end_warning\n" "<w" nil nil nil "/home/user1/.emacs.d/snippets/org-mode/warning" nil nil)
 		       ("<t" "#+begin_tip\n$0\n#+end_tip\n" "<t" nil nil nil "/home/user1/.emacs.d/snippets/org-mode/tip" nil nil)
+		       ("<nspf" "#+BEGIN_SRC python :noweb-ref $1.lib :session $1.lib\ndef $2($3):\n    $0\n#+END_SRC\n" "org-python-function" nil nil nil "/home/user1/.emacs.d/snippets/org-mode/org-python-function" nil nil)
 		       ("<n" "#+begin_note\n$0\n#+end_note\n" "<n" nil nil nil "/home/user1/.emacs.d/snippets/org-mode/note" nil nil)
 		       ("<nsb" "#+name: $0\n#+begin_src bash :session test\n\n#+end_src" "<nsb" nil nil nil "/home/user1/.emacs.d/snippets/org-mode/named-bash-source-block" nil nil)
 		       ("<i" "#+begin_info\n$0\n#+end_info\n" "<i" nil nil nil "/home/user1/.emacs.d/snippets/org-mode/info" nil nil)
@@ -13,6 +14,47 @@
 		       ("<test" "#+name: $1-test-$2\n#+begin_src bash\n  $1_test_$2()(\n      [[ \"\\$($1 $0)\" == ]] || { echo FAIL && return 1; }\n      echo PASS && return 0\n  )\n#+end_src\n" "<test" nil nil nil "/home/user1/.emacs.d/snippets/org-mode/<test" nil nil)
 		       ("<sb" "#+begin_src bash\n$0\n#+end_src\n" "<sb" nil nil nil "/home/user1/.emacs.d/snippets/org-mode/<sb" nil nil)
 		       ("<rt" "#+NAME: $1\n#+CAPTION: \"$2\"\n#+ATTR_HTML: :class right-table\n$0" "<rt" nil nil nil "/home/user1/.emacs.d/snippets/org-mode/<rt" nil nil)
+		       ("<pysubmod" "*** ${3:submodulename}\n\nThe module path:\n\n#+BEGIN_SRC python :noweb-ref \"\" :session $3.lib\n# default_exp ${2:modulename}.$3\n#+END_SRC\n\nImports:\n\n#+BEGIN_SRC python :noweb-ref \"\" :session $3.lib :tangle $2/$3.py\n# exports\n\"\"\"Submod Doc-String\"\"\"\n#<<$2.$3.imports>>#\n#+END_SRC\n\nThe collected classes, functions and tests in the library:\n\n#+BEGIN_SRC python :noweb-ref \"\" :session $3 :tangle $2/$3.py\n#<<$2.$3.globals>>#\n#<<$2.$3.lib>>#\n#<<$2.$3.test>>#\n#+END_SRC\n\nThe collected tests in a separate file:\n\n#+BEGIN_SRC python :noweb-ref \"\" :session $3 :tangle $2/test_$3.py\nfrom ${1:appname}.$2.$3 import *\n#<<$2.$3.test>>#\n#+END_SRC\n\nThe main code. We add pass in the pattern in case we don't\ncreate any main-code\n\n#+BEGIN_SRC python :noweb-ref \"\" :session submod :tangle $2/$3.py\n# exports\ndef main():\n    pass\n    #<<$2.$3.main>>#\n#+END_SRC\n\n*** The Story of $3\n$0\n#+BEGIN_SRC python :noweb-ref \"$2.$3.imports\" :session $3\n# exports\nimport os as os\n#+END_SRC\n\n#+BEGIN_SRC python :noweb-ref \"$2.$3.lib\" :session $3\n# exports\ndef hello():\n    \"hello() returns the string \\\\\\\"Hello, world!\\\\\\\"\"\n    return \"Hello, world!\"\n#+END_SRC\n\n#+BEGIN_SRC python :noweb-ref \"$2.$3.test\" :session $3\n# exports\ndef test_hello():\n    \"\"\"Testing the hello function\"\"\"\n    assert hello() == \"Hello, world!\"\n#+END_SRC\n\n#+BEGIN_SRC python :noweb-ref \"$2.$3.main\" :session $3\n# exports\nprint(hello())\n#+END_SRC\n\n*** Test Results for $3\n\n#+begin_src bash :session $3_test :results output\npytest $2/test_$3.py\n#+end_src\n\n*** CLI Arguments to $3\n\n#+BEGIN_SRC python :noweb-ref \"\" :session $3 :tangle $2/$3.py\n# exports\nif __name__ == \"__main__\":\n    main()\n#+END_SRC\n" "<pysubmod" nil nil
+			((yas-after-exit-snippet-hook #'org-align-all-tags)
+			 (yas-indent-line 'fixed)
+			 (yas-wrap-around-region 'auto))
+			"/home/user1/.emacs.d/snippets/org-mode/<pysubmod" nil nil)
+		       ("<pymod" "** ${2:modulename}\n\nThe =__init__= thing\n\n#+BEGIN_SRC python :noweb-ref \"\" :tangle $2/__init__.py\n#+END_SRC\n\n*** ${3:submodulename}\n\nThe module path:\n\n#+BEGIN_SRC python :noweb-ref \"\" :session $3.lib\n# default_exp $2.$3\n#+END_SRC\n\nImports:\n\n#+BEGIN_SRC python :noweb-ref \"\" :session $3.lib :tangle $2/$3.py\n# exports\n\"\"\"Submod Doc-String\"\"\"\n#<<$2.$3.imports>>#\n#+END_SRC\n\nThe collected classes, functions and tests in the library:\n\n#+BEGIN_SRC python :noweb-ref \"\" :session $3 :tangle $2/$3.py\n#<<$2.$3.globals>>#\n#<<$2.$3.lib>>#\n#<<$2.$3.test>>#\n#+END_SRC\n\nThe collected tests in a separate file:\n\n#+BEGIN_SRC python :noweb-ref \"\" :session $3 :tangle $2/test_$3.py\nfrom ${1:appname}.$2.$3 import *\n#<<$2.$3.test>>#\n#+END_SRC\n\nThe main code. We add pass in the pattern in case we don't\ncreate any main-code\n\n#+BEGIN_SRC python :noweb-ref \"\" :session submod :tangle $2/$3.py\n# exports\ndef main():\n    pass\n    #<<$2.$3.main>>#\n#+END_SRC\n\n*** The Story of $3\n$0\n#+BEGIN_SRC python :noweb-ref \"$2.$3.imports\" :session $3\n# exports\nimport os as os\n#+END_SRC\n\n#+BEGIN_SRC python :noweb-ref \"$2.$3.lib\" :session $3\n# exports\ndef hello():\n    \"hello() returns the string \\\\\\\"Hello, world!\\\\\\\"\"\n    return \"Hello, world!\"\n#+END_SRC\n\n#+BEGIN_SRC python :noweb-ref \"$2.$3.test\" :session $3\n# exports\ndef test_hello():\n    \"\"\"Testing the hello function\"\"\"\n    assert hello() == \"Hello, world!\"\n#+END_SRC\n\n#+BEGIN_SRC python :noweb-ref \"$2.$3.main\" :session $3\n# exports\nprint(hello())\n#+END_SRC\n\n*** Test Results for $3\n\n#+begin_src bash :session $3_test :results output\npytest $2/test_$3.py\n#+end_src\n\n*** CLI Arguments to $3\n\n#+BEGIN_SRC python :noweb-ref \"\" :session $3 :tangle $2/$3.py\n# exports\nif __name__ == \"__main__\":\n    main()\n#+END_SRC\n" "<pymod" nil nil
+			((yas-after-exit-snippet-hook #'org-align-all-tags)
+			 (yas-indent-line 'fixed)
+			 (yas-wrap-around-region 'auto))
+			"/home/user1/.emacs.d/snippets/org-mode/<pymod" nil nil)
+		       ("<pyapp" "#+PROPERTY: header-args:python :shebang \"#!/usr/bin/env python3\" :eval no-export :noweb no-export :mkdirp yes\n#+PROPERTY: header-args:jupyter-python :shebang \"#!/usr/bin/env python3\" :eval no-export :noweb no-export :mkdirp yes\n#+PROPERTY: header-args:bash :shebang \"#!/usr/bin/env bash\" :eval no-export :noweb no-export :mkdirp yes\n\n* TODO ${1:appname}\n\nThe =__init__= thing\n\n#+BEGIN_SRC python :noweb-ref \"\" :tangle __init__.py\n#+END_SRC\n\n** ${2:modulename}\n\nThe =__init__= thing\n\n#+BEGIN_SRC python :noweb-ref \"\" :tangle $2/__init__.py\n#+END_SRC\n\n*** ${3:submodulename}\n\nThe module path:\n\n#+BEGIN_SRC python :noweb-ref \"\" :session $3.lib\n# default_exp $2.$3\n#+END_SRC\n\nImports:\n\n#+BEGIN_SRC python :noweb-ref \"\" :session $3.lib :tangle $2/$3.py\n# exports\n\"\"\"Submod Doc-String\"\"\"\n#<<$2.$3.imports>>#\n#+END_SRC\n\nThe collected classes, functions and tests in the library:\n\n#+BEGIN_SRC python :noweb-ref \"\" :session $3 :tangle $2/$3.py\n#<<$2.$3.globals>>#\n#<<$2.$3.lib>>#\n#<<$2.$3.test>>#\n#+END_SRC\n\nThe collected tests in a separate file:\n\n#+BEGIN_SRC python :noweb-ref \"\" :session $3 :tangle $2/test_$3.py\nfrom $1.$2.$3 import *\n#<<$2.$3.test>>#\n#+END_SRC\n\nThe main code. We add pass in the pattern in case we don't\ncreate any main-code\n\n#+BEGIN_SRC python :noweb-ref \"\" :session submod :tangle $2/$3.py\n# exports\ndef main():\n    pass\n    #<<$2.$3.main>>#\n#+END_SRC\n\n*** The Story of $3\n$0\n#+BEGIN_SRC python :noweb-ref \"$2.$3.imports\" :session $3\n# exports\nimport os as os\n#+END_SRC\n\n#+BEGIN_SRC python :noweb-ref \"$2.$3.lib\" :session $3\n# exports\ndef hello():\n    \"hello() returns the string \\\\\\\"Hello, world!\\\\\\\"\"\n    return \"Hello, world!\"\n#+END_SRC\n\n#+BEGIN_SRC python :noweb-ref \"$2.$3.test\" :session $3\n# exports\ndef test_hello():\n    \"\"\"Testing the hello function\"\"\"\n    assert hello() == \"Hello, world!\"\n#+END_SRC\n\n#+BEGIN_SRC python :noweb-ref \"$2.$3.main\" :session $3\n# exports\nprint(hello())\n#+END_SRC\n\n*** Test Results for $3\n\n#+begin_src bash :session $3_test :results output\npytest $2/test_$3.py\n#+end_src\n\n*** CLI Arguments to $3\n\n#+BEGIN_SRC python :noweb-ref \"\" :session $3 :tangle $2/$3.py\n# exports\nif __name__ == \"__main__\":\n    main()\n#+END_SRC\n\n* Test results for $1\n\n#+begin_src bash :session $1_test :results output\npytest .\n#+end_src\n\n** libutils\n\n[[https://stackoverflow.com/a/35710527/7612826][Reference]]\n\nWhen importing the export function from this module, we can use\n@export as decorator for functions we want included in ~__all__~.\n\n#+BEGIN_SRC python :noweb-ref \"\" :tangle utils/libutils.py :session $1\n# export utils.libutils\nimport sys\ndef export(fn):\n    mod = sys.modules[fn.__module__]\n    if hasattr(mod, '__all__'):\n        mod.__all__.append(fn.__name__)\n    else:\n        mod.__all__ = [fn.__name__]\n    return fn\n#+END_SRC\n\n* COMMENT babel settings\n  \n# Local Variables:\n# org-babel-noweb-wrap-start: \"#<<\"\n# org-babel-noweb-wrap-end: \">>#\"\n# org-confirm-babel-evaluate: nil\n# org-src-preserve-indentation: t\n# org-my-foo: bar\n# org-my-aNumber: 32\n# End:\n" "<pyapp" nil nil
+			((yas-after-exit-snippet-hook #'org-align-all-tags)
+			 (yas-indent-line 'fixed)
+			 (yas-wrap-around-region 'auto))
+			"/home/user1/.emacs.d/snippets/org-mode/<pyapp" nil nil)
+		       ("<nspyt" "#+BEGIN_SRC python :noweb-ref \"${1:modulename}.${2:submodulename}.test\" :session $2\n# exports\n@export\ndef test_${3:name}(${4:args}):\n    $0\n#+END_SRC\n" "<nspyt" nil nil
+			((yas-after-exit-snippet-hook #'org-align-all-tags)
+			 (yas-indent-line 'fixed)
+			 (yas-wrap-around-region 'auto))
+			"/home/user1/.emacs.d/snippets/org-mode/<nspyt" nil nil)
+		       ("<nspym" "#+BEGIN_SRC python :noweb-ref \"${1:modulename}.${2:submodulename}.main\" :session $2\n# exports\n$0\n#+END_SRC\n" "<nspym" nil nil nil "/home/user1/.emacs.d/snippets/org-mode/<nspym" nil nil)
+		       ("<nspyi" "#+BEGIN_SRC python :noweb-ref \"${1:modulename}.${2:submodulename}.imports\" :session $2\nfrom $3 import $0\n#+END_SRC\n" "<nspyi" nil nil
+			((yas-after-exit-snippet-hook #'org-align-all-tags)
+			 (yas-indent-line 'fixed)
+			 (yas-wrap-around-region 'auto))
+			"/home/user1/.emacs.d/snippets/org-mode/<nspyi" nil nil)
+		       ("<nspyg" "#+BEGIN_SRC python :noweb-ref \"${1:modulename}.${2:submodulename}.globals\" :session $2\n# exports\n$0\n#+END_SRC\n" "<nspyg" nil nil
+			((yas-after-exit-snippet-hook #'org-align-all-tags)
+			 (yas-indent-line 'fixed)
+			 (yas-wrap-around-region 'auto))
+			"/home/user1/.emacs.d/snippets/org-mode/<nspyg" nil nil)
+		       ("<nspyf" "#+BEGIN_SRC python :noweb-ref \"${1:modulename}.${2:submodulename}.lib\" :session $2\n# exports\n@export\ndef ${3:name}(${4:args}):\n    $0\n#+END_SRC\n" "<nspyf" nil nil
+			((yas-after-exit-snippet-hook #'org-align-all-tags)
+			 (yas-indent-line 'fixed)
+			 (yas-wrap-around-region 'auto))
+			"/home/user1/.emacs.d/snippets/org-mode/<nspyf" nil nil)
+		       ("<nspyc" "#+BEGIN_SRC python :noweb-ref \"${1:modulename}.${2:submodulename}.lib\" :session $2\n# exports\n@export\nclass ${3:name}(${4:args}):\n    $0\n#+END_SRC\n" "<nspyc" nil nil
+			((yas-after-exit-snippet-hook #'org-align-all-tags)
+			 (yas-indent-line 'fixed)
+			 (yas-wrap-around-region 'auto))
+			"/home/user1/.emacs.d/snippets/org-mode/<nspyc" nil nil)
 		       ("<nsp" "#+BEGIN_SRC python :noweb-ref $1\n$0\n#+END_SRC" "<nsp" nil nil nil "/home/user1/.emacs.d/snippets/org-mode/<nsp" nil nil)
 		       ("<nsel" "#+begin_src emacs-lisp\n$0\n#+end_src\n" "<nsel" nil nil nil "/home/user1/.emacs.d/snippets/org-mode/<nsel" nil nil)
 		       ("<nsbusage" "#+name: ${1:enumerate}-usage\n#+begin_src bash\n$1_usage(){\ncat <<'EOF'\nExample:\n\n    <<$1-ex>>\n\nResults:\n\n    <<$1-ex()>>\n\nEOF\n}\n#+end_src\n$0" "<nsbusage" nil nil nil "/home/user1/.emacs.d/snippets/org-mode/<nsbusage" nil nil)
@@ -56,4 +98,4 @@
 			"/home/user1/.emacs.d/snippets/org-mode/<bbp" nil nil)))
 
 
-;;; Do not edit! File generated at Wed Oct 28 09:51:54 2020
+;;; Do not edit! File generated at Mon Nov  9 08:03:45 2020

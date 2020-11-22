@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: org-python-function
+# key: <nspf
+# --
+#+BEGIN_SRC python :noweb-ref $1.lib :session $1.lib
+def $2($3):
+    $0
+#+END_SRC

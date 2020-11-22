@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# expand-env: ((yas-after-exit-snippet-hook #'org-align-all-tags) (yas-indent-line 'fixed) (yas-wrap-around-region 'auto))
+# name: <nspyg
+# key: <nspyg 
+# --
+#+BEGIN_SRC python :noweb-ref "${1:modulename}.${2:submodulename}.globals" :session $2
+# exports
+$0
+#+END_SRC

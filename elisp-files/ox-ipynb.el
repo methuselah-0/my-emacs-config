@@ -242,6 +242,7 @@ or $$fragment$$ for ipynb."
   "Make a link in TEXT into markdown.
 For some reason I was getting angle brackets in them I wanted to remove.
 This only fixes file links with no description I think.
+
 [2019-08-11 Sun] added a small additional condition to not change
 text starting with <sup. These are citations, and the previous
 version was incorrectly modifying them."
@@ -297,19 +298,26 @@ version was incorrectly modifying them."
   "Return the markdown cell for the string S."
   (let* ((org-export-filter-latex-fragment-functions '(ox-ipynb-filter-latex-fragment))
          (org-export-filter-link-functions '(ox-ipynb-filter-link))
-         (org-export-filter-keyword-functions '(ox-ipynb-keyword-link))
          ;; I overwrite the org function here because it does not give the right
          ;; levels otherwise. This one outputs exactly the level that is listed.
 	 ;; Also, I modify the table exporters here to get a markdown table for
 	 ncolumns
 	 (nrules 0)
+	 (org-html-text-markup-alist '((bold . "<b>%s</b>")
+				       (code . "<code>%s</code>")
+				       (italic . "<i>%s</i>")
+				       (strike-through . "<del>%s</del>")
+				       (underline . "<u>%s</u>")
+				       (verbatim . "<code>%s</code>")))  	; we overwrite the underline
          (md (cl-letf (((symbol-function 'org-md-headline)
 			(lambda (HEADLINE CONTENTS INFO)
 			  (concat
 			   (cl-loop for i to (org-element-property :level HEADLINE)
 				    concat "#")
 			   " "
-			   (org-element-property :raw-value HEADLINE))))
+			   (org-export-string-as
+			    (org-element-property :raw-value HEADLINE)
+			    'md t '(:with-toc nil :with-tags nil)))))
 		       ((symbol-function 'org-export-get-relative-level)
                         (lambda (headline info)
 			  (org-element-property :level headline)))
@@ -337,6 +345,7 @@ version was incorrectly modifying them."
 	 (pos 0)
 	 (attachments '())
 	 metadata)
+
     ;; we need to do some work to make images inlined for portability.
     (while (setq pos (string-match "(attachment:\\(.*\\))" md (+ 1 pos)))
       (push  (list (match-string 1 md)
@@ -918,6 +927,13 @@ found in the ob-tangle.el file."
         (?r "to notebook with no results and open" ox-ipynb-export-to-ipynb-no-results-file-and-open)
 	(?s "to slides and open" ox-ipynb-export-to-ipynb-slides-and-open))))
 
+
+(defun ox-ipynb-publish-to-notebook (plist filename pub-dir)
+  "Publish an org-file to a Jupyter notebook."
+  (with-current-buffer (find-file-noselect filename)
+    (let ((output (ox-ipynb-export-to-ipynb-file)))
+      (org-publish-attachment plist (expand-file-name output)  pub-dir)
+      output)))
 
 (provide 'ox-ipynb)
 

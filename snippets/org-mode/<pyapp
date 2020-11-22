@@ -49,6 +49,8 @@ The =__init__= thing
 
 ** ${3:submodulename} - API
 
+*** Imports
+
 Imports in $3:
 
 #+BEGIN_SRC python :noweb-ref "" :session $3 :tangle $2/$3.py
@@ -57,9 +59,11 @@ Imports in $3:
 import sys, os, inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
-sys.path.insert(0, currentdir)
+sys.path.insert(0, parentdir)
 #<<$2.$3.imports>>#
 #+END_SRC
+
+*** Lib
 
 The collected classes, functions and global variables in the library:
 
@@ -69,6 +73,20 @@ The collected classes, functions and global variables in the library:
 #<<$2.$3.lib>>#
 #+END_SRC
 
+*** Internal
+
+Internal functions and classes are not shown here, but documented
+throughout the story.
+
+#+BEGIN_SRC python :noweb-ref "" :session $3 :tangle $2/test_$3.py
+# exporti $2.test_$3
+from $1.utils.libutils import export
+from $1.$2.$3 import *
+#<<$2.$3.test>>#
+#+END_SRC
+
+*** Tests
+
 The collected tests go in the $2.test_$3 module
 
 #+BEGIN_SRC python :noweb-ref "" :session $3 :tangle $2/test_$3.py
@@ -77,6 +95,8 @@ from $1.utils.libutils import export
 from $1.$2.$3 import *
 #<<$2.$3.test>>#
 #+END_SRC
+
+*** Main
 
 The main code:
 
@@ -99,7 +119,7 @@ print(subprocess.check_output("pytest $2/test_$3.py", shell = True).decode("utf-
 
 #+BEGIN_SRC python :noweb-ref "" :session $3 :tangle $2/$3.py
 # exports $2.$3
-if __name__ == "__main__":
+if sys.argv[1] == "main_$3":
     main_$3()
 #+END_SRC
 
@@ -141,7 +161,7 @@ print(subprocess.check_output("pytest .", shell = True).decode("utf-8"))
 
 * Building docs
 
-#+begin_src python :session $1_docs :results output :exports both
+#+begin_src python :session $1_docs :results output :exports both :async yes
 import subprocess
 libs_order = "utils_temp.ipynb libutils_temp.ipynb $2_temp.ipynb $3_temp.ipynb test_$3_temp.ipynb $1_temp.ipynb"
 cmd = "cd ../../ && " + "_NBDEV_ORG_BABEL_ARGS=\\\"--build-libs-order " + libs_order + "\\\" nbdev_build_docs_from_org" + "; cd -"
@@ -150,22 +170,26 @@ print(subprocess.check_output(cmd, shell = True).decode("utf-8"))
 
 * Running $1
 
+From the command-line:
+
 #+begin_src bash :session run
-PYTHONPATH=$\(a=$\(pwd);echo "$\{a%/*}"):$PYTHONPATH python3 
+PYTHONPATH=$\(a=$\(pwd);echo "$\{a%/*}"):$PYTHONPATH python3 -m $1.$2.$3 main_$3
 #+end_src
 
-Or in a guix virtualenv
+Or in a guix virtualenv for the org-babel lib-outputs:
 
 #+BEGIN_SRC bash :noweb-ref "" :tangle ../.guix-env
+mapfile -t Reqs < <(grep -oP '(?<=\ )[0-9a-zA-Z-_]+' <(grep -E '^requirements = ' ../settings.ini))
 # guix environment --pure --ad-hoc python "\${Reqs[@]/#/python-}" -- python3 -c 'import os; print(os.environ)'
-mapfile -t Reqs < <(grep -oP '(?<=\ )[a-zA-Z-_]+' <(grep -E '^requirements = ' ../settings.ini))
-guix environment --pure --ad-hoc python "\${Reqs[@]/#/python-}" -- python3
+guix environment --pure --ad-hoc python "\${Reqs[@]/#/python-}" -- python3 -m $1.$2.$3
 #+end_src
 
+Or in a guix virtualenv for the nbdev lib-outputs:
+
 #+BEGIN_SRC bash :noweb-ref "" :tangle ../../.guix-env
+mapfile -t Reqs < <(grep -oP '(?<=\ )[0-9a-zA-Z-_]+' <(grep -E '^requirements = ' settings.ini))
 # guix environment --pure --ad-hoc python "\${Reqs[@]/#/python-}" -- python3 -c 'import os; print(os.environ)'
-mapfile -t Reqs < <(grep -oP '(?<=\ )[a-zA-Z-_]+' <(grep -E '^requirements = ' settings.ini))
-guix environment --pure --ad-hoc python "\${Reqs[@]/#/python-}" -- python3
+guix environment --pure --ad-hoc python "\${Reqs[@]/#/python-}" -- python3 -m $1.$2.$3
 #+end_src
 
 * COMMENT babel settings

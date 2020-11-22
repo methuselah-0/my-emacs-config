@@ -1,0 +1,84 @@
+# -*- mode: snippet -*-
+# expand-env: ((yas-after-exit-snippet-hook #'org-align-all-tags) (yas-indent-line 'fixed) (yas-wrap-around-region 'auto))
+# name: <pymod
+# key: <pymod
+# --
+* ${2:modulename}
+
+The =__init__= thing
+
+#+BEGIN_SRC python :noweb-ref "" :tangle $2/__init__.py
+#+END_SRC
+
+** ${3:submodulename}
+
+Imports:
+
+#+BEGIN_SRC python :noweb-ref "" :session $3.lib :tangle $2/$3.py
+# exports $2.$3
+"""Submod Doc-String"""
+#<<$2.$3.imports>>#
+#+END_SRC
+
+The collected classes, functions and global variables in the library:
+
+#+BEGIN_SRC python :noweb-ref "" :session $3 :tangle $2/$3.py
+#<<$2.$3.globals>>#
+#<<$2.$3.lib>>#
+#+END_SRC
+
+The collected tests in the $2.test_$3 module.
+
+#+BEGIN_SRC python :noweb-ref "" :session $3 :tangle $2/test_$3.py
+# exporti $2.test_$3
+from ${1:appname}.$2.$3 import *
+#<<$2.$3.test>>#
+#+END_SRC
+
+The main code:
+
+#+BEGIN_SRC python :noweb-ref "" :session $3 :tangle $2/$3.py
+# exports
+def main_$3():
+    pass
+    #<<$2.$3.main>>#
+#+END_SRC
+
+*** The Story of $3
+$0
+#+BEGIN_SRC python :noweb-ref "$2.$3.imports" :session $3
+# exports $2.$3
+from myapp.utils.libutils import export
+#+END_SRC
+
+#+BEGIN_SRC python :noweb-ref "$2.$3.lib" :session $3
+# exports $2.$3
+def hello_$3():
+    "hello_$3() returns the string \\\"Hello, world!\\\""
+    return "Hello, world!"
+#+END_SRC
+
+#+BEGIN_SRC python :noweb-ref "$2.$3.test" :session $3
+# exports $2.test_$3
+def test_hello_$3():
+    """Testing the hello function"""
+    assert hello_$3() == "Hello, world!"
+#+END_SRC
+
+#+BEGIN_SRC python :noweb-ref "$2.$3.main" :session $3
+print(hello_$3())
+#+END_SRC
+
+*** Test Results for $3
+
+#+begin_src bash :session $3_test :results output
+pytest $2/test_$3.py
+#+end_src
+
+*** CLI Arguments to $3
+
+#+BEGIN_SRC python :noweb-ref "" :session $3 :tangle $2/$3.py
+# exports $2.$3
+if __name__ == "__main__":
+    main_$3()
+#+END_SRC

@@ -1,0 +1,20 @@
+# -*- mode: snippet -*-
+# expand-env: ((yas-after-exit-snippet-hook #'org-align-all-tags) (yas-indent-line 'fixed) (yas-wrap-around-region 'auto))
+# name: <nspyf
+# key: <nspyf
+# --
+#+BEGIN_SRC python :noweb-ref "${1:modulename}.${2:submodulename}.lib" :session $2
+# exports
+@export
+def ${3:name}(${4:args}):
+    """$5"""
+    $0
+#+END_SRC
+
+#+BEGIN_SRC python :noweb-ref "${1:modulename}.${2:submodulename}.test" :session $2
+# exports
+@export
+def test_$3($4):
+    """$3 must return Y if given X as first argument"""
+    
+#+END_SRC

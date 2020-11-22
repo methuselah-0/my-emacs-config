@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: <nspym
+# key: <nspym
+# --
+#+BEGIN_SRC python :noweb-ref "${1:modulename}.${2:submodulename}.main" :session $2
+$0
+#+END_SRC
