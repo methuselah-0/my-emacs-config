@@ -1,3 +1,179 @@
+* How to install
+** Download this repo
+
+The easiest thing is to download it to =~/src/my-emacs-config=, since
+there are some hardcoded paths in this setup.
+
+#+begin_src bash
+  mkdir -p ~/src
+  cd ~/src
+  git clone https://github.com/methuselah-0/my-emacs-config.git
+#+end_src
+
+** Backup current .emacs.d and .emacs files
+
+For example, by:
+
+#+begin_src bash :eval never
+  mv ~/.emacs ~/.emacs.bak
+  mv ~/.emacs.d ~/.emacs.d.bak
+#+end_src
+
+** Create new ~/.emacs.d
+
+*** init.el
+
+Create the directory =~/.emacs.d= and link in init.el that will load
+the file =~/.emacs.d/config.org=:
+
+#+begin_src bash
+  mkdir -p ~/.emacs.d
+  ln -s ~/src/my-emacs-config/init.el ~/.emacs.d/init.el
+#+end_src
+
+*** config.org
+
+Then add the config.org file in =~/.emacs.d/config.org=
+
+#+begin_src bash
+  ln -s ~/.emacs.d/config.org ~/src/my-emacs-config/config.org
+#+end_src
+
+*** symlink the elpa, elisp-files and snippets directories
+
+#+begin_src bash
+  ln -s ~/src/my-emacs-config/elpa ~/.emacs.d/elpa
+  ln -s ~/src/my-emacs-config/elisp-files ~/.emacs.d/elisp-files
+  ln -s ~/src/my-emacs-config/snippets ~/.emacs.d/snippets
+#+end_src
+
+** Install tern via npm
+
+#+begin_src bash
+  sudo npm install --prefix ~/src/my-emacs-config/ tern
+#+end_src
+
+** Add emacs packages
+
+Some are install in elpa directory already. Remaining ones can be
+installed via Guix.
+
+*** Guix
+
+If you don't have guix installed you can install it as a stand-alone
+distro or as a package manager. Find guix-install.sh to try it out on
+a "foreign distro". Make sure to run ~guix pull~ as both root and your
+normal user before continuing. If you already have Guix installed, you
+can just continue.
+
+*** install emacs packages via Guix manifest
+
+You could modify the manifest to your liking, perhaps merge and fix
+with your own current list of packages or manifest. When done, apply
+it with the channels file that comes with this repo:
+
+#+begin_src bash
+  guix pull -C ~/src/my-emacs-config/channels.scm
+  guix package --fallback -m ~/src/my-emacs-config/manifest.scm
+#+end_src
+
+If this breaks your stuff you might have to fix stuff here before
+continuing.
+
+** Special configuration files
+*** caldav-conf.el
+
+If you add this to =~/.emacs.d/caldav-conf.el= it should be
+automatically picked up because of 2 lines in the config.org that
+reads it.
+
+If the full path is
+=https://nextcloud.mydomain.tld/remote.php/dav/calendars/1a2a123-a23b-1234-123a-12345678a123/calendarname/=,
+you would add the following:
+
+#+begin_src emacs-lisp :eval never :tangle ~/.emacs.d/caldav-conf.el
+  (setq org-caldav-calendars
+	'((:calendar-id "1a2a123-a23b-1234-123a-12345678a123/calendarname"
+			:files ("~/org/home.org")
+			:inbox "~/org/fromhome.org"
+			:caldav-url "https://nextcloud.mydomain.tld/remote.php/dav/calendars"
+			:icalendar-timezone "Europe/Stockholm"
+		    )
+	  ;; (:calendar-id "1a2a123-a23b-1234-123a-12345678a123/calendarname"
+	  ;; 	      :files ("~/org/home.org")
+	  ;; 	      :inbox "~/org/fromhome.org"
+	  ;; 	      :caldav-url "https://nextcloud.mydomain.tld/remote.php/dav/calendars"
+	  ;; 	      :icalendar-timezone "Europe/Stockholm"
+	  ;; 	      :skip-conditions (regexp "soccer")		      
+	  ;; 	  )
+      ))
+#+end_src
+
+If you have ics-calendars, I don't know how to sync edits back up, but
+you can at least fetch to org-format. Create the file
+=~/.emacs.d/ics-calendars.txt=:
+
+#+begin_src text :tangle "~/.emacs.d/ics-calendars.txt"
+<calendar-name> <some-ics-url>
+~/org/work.org
+~/org/home.org
+~/org/fromhome.org
+~/org/notes.org
+#+end_src
+
+All these files will be fetched and reformatted on demand by the
+fetch-calendars.pl script.
+
+*** agenda files
+
+These are your own org-files that you can add to for example:
+
+#+begin_src emacs-lisp
+  ;;'(org-agenda-files (quote ("~/org/notes.org" "~/org/work.org" "~/org/home.org")))
+  (setq org-agenda-files (list "~/org/work.org"
+			       "~/org/notes.org"
+			       "~/org/home.org"
+			       "~/org/fromhome.org"
+))
+  (add-hook 'after-init-hook 'org-agenda-list)
+#+end_src
+
+*** contacts files
+
+You probably want to edit the contacts files.
+
+** cronjob extra
+
+For org-alert to work as intended here, we need to continuously add
+the NEXT todo-keyword in the org-headers when events are within half
+an hour. These needs to be inserted by a perl-script that runs once a
+minute. I also have an ics-calender that I want fetched and updated
+once a minute. To do this I run fetch-calendars.pl which also calls
+out to ical2org.pl and org-schedule.pl and it is org-schedule.pl that
+updates the NEXT header.
+
+As I'm on GuixSD, I run the cronjob by adding the following to
+=~/.config/cron/job.guile=:
+
+#+begin_src emacs-lisp :eval never :tangle ~/.config/cron/job.guile
+;; -*- geiser-scheme-implementation: guile -*-
+;; make sure to add mcron & in ~/.profile
+;; (job '(next-minute (range 0 60 5)) "dosomethingevery5minutes")
+;; (job '(next-minute (range 0 60 10)) "dosomethingevery10minutes")
+(job '(next-minute (range 0 60 1)) "perl ~/src/my-emacs-config/fetch-calendars.pl ~/.emacs.d/ics-calendars.txt ~/.emacs.d/todokeywords.txt")
+#+end_src
+
+and also by adding =mcron &= to =~/.profile=. However, before running
+mcron, make sure to start emacs once first, because the
+todokeywords.txt file is created via an org-mode-hook defined in
+config.org so if you change the path or the hook this cronjob needs
+adjusted as well. The =ics-calendars.txt= file is setup as [[*caldav-conf.el][below]].
+
+
+#+begin_src bash :eval never :tangle ~/.profile
+mcron &
+#+end_src
+
 * Additional info
 ** org-contacts2vcard
 
@@ -106,209 +282,3 @@ See [[*cronjob extra][here]] under [[*How to install][How to install]].
   ,#+OPTIONS: toc:nil
 #+end_src
 
-* How to install
-** Download this repo
-
-The easiest thing is to download it to =~/src/my-emacs-config=, since
-there are some hardcoded paths in this setup.
-
-#+begin_src bash
-  mkdir -p ~/src
-  cd ~/src
-  git clone https://github.com/methuselah-0/my-emacs-config.git
-#+end_src
-
-** Backup current .emacs.d and .emacs files
-
-For example, by:
-
-#+begin_src bash :eval never
-  mv ~/.emacs ~/.emacs.bak
-  mv ~/.emacs.d ~/.emacs.d.bak
-#+end_src
-
-** Create new ~/.emacs.d
-
-*** init.el
-
-Create the directory =~/.emacs.d= and link in init.el that will load
-the file =~/.emacs.d/config.org=:
-
-#+begin_src bash
-  mkdir -p ~/.emacs.d
-  ln -s ~/src/my-emacs-config/init.el ~/.emacs.d/init.el
-#+end_src
-
-*** config.org
-
-Then add the config.org file in =~/.emacs.d/config.org=
-
-#+begin_src bash
-  ln -s ~/.emacs.d/config.org ~/src/my-emacs-config/config.org
-#+end_src
-
-*** symlink the elpa, elisp-files and snippets directories
-
-#+begin_src bash
-  ln -s ~/src/my-emacs-config/elpa ~/.emacs.d/elpa
-  ln -s ~/src/my-emacs-config/elisp-files ~/.emacs.d/elisp-files
-  ln -s ~/src/my-emacs-config/snippets ~/.emacs.d/snippets
-#+end_src
-
-** Add emacs packages
-
-*** Guix
-
-If you don't have guix installed you can install it as a stand-alone
-distro or as a package manager. Find guix-install.sh to try it out on
-a "foreign distro". Make sure to run ~guix pull~ as both root and your
-normal user before continuing. If you already have Guix installed, you
-can just continue.
-
-*** install emacs packages via Guix manifest
-
-First we install a guix channel to pull our emacs packages from:
-
-#+begin_src scheme :eval never :tangle ~/.config/guix/channels.scm
-  (list (channel
-	 (name 'guix)
-	 (url "https://git.savannah.gnu.org/git/guix.git")
-	 ;; 1 commit before the change for python-prompt-toolkit etc which breaks the jupyter package
-	 ;; (commit  "bcbd63407e933ce04aef72757387a0bacdb07e77")
-	 (branch  "master")
-	 )
-	(channel
-	 (name 'my-guix-packages)
-	 (url "https://github.com/methuselah-0/my-guix-packages.git")
-	 )
-	)
-#+end_src
-
-Now we need to update with the new channels:
-
-#+begin_src bash
-  guix pull
-#+end_src
-
-Next download the following package manifest:
-
-#+begin_src bash
-  mkdir -p ~/guix-manifests
-  wget -O ~/guix-manifests/emacs-setup.scm "https://raw.githubusercontent.com/methuselah-0/my-guixsd-config.sh/master/user1.scm"
-#+end_src
-
-You could modify it to your liking, perhaps merge and fix with your
-own current list of packages or manifest. When done, apply it:
-
-#+begin_src bash
-  guix package --fallback -m ~/guix-manifests/emacs-setup.scm
-#+end_src
-
-Alternatively, you can just use ~guix package --channels=/tmp/channels.scm --fallback -m
-~/guix-manifests/emacs-setup.scm~
-
-If this breaks your stuff you might have to fix stuff here before
-continuing.
-
-** Special configuration files
-*** caldav-conf.el
-
-If you add this to =~/.emacs.d/caldav-conf.el= it should be
-automatically picked up because of 2 lines in the config.org that
-reads it.
-
-If the full path is
-=https://nextcloud.mydomain.tld/remote.php/dav/calendars/1a2a123-a23b-1234-123a-12345678a123/calendarname/=,
-you would add the following:
-
-#+begin_src emacs-lisp :eval never :tangle ~/.emacs.d/caldav-conf.el
-  (setq org-caldav-calendars
-	'((:calendar-id "1a2a123-a23b-1234-123a-12345678a123/calendarname"
-			:files ("~/org/home.org")
-			:inbox "~/org/fromhome.org"
-			:caldav-url "https://nextcloud.mydomain.tld/remote.php/dav/calendars"
-			:icalendar-timezone "Europe/Stockholm"
-		    )
-	  ;; (:calendar-id "1a2a123-a23b-1234-123a-12345678a123/calendarname"
-	  ;; 	      :files ("~/org/home.org")
-	  ;; 	      :inbox "~/org/fromhome.org"
-	  ;; 	      :caldav-url "https://nextcloud.mydomain.tld/remote.php/dav/calendars"
-	  ;; 	      :icalendar-timezone "Europe/Stockholm"
-	  ;; 	      :skip-conditions (regexp "soccer")		      
-	  ;; 	  )
-      ))
-#+end_src
-
-If you have ics-calendars, I don't know how to sync edits back up, but
-you can at least fetch to org-format. Create the file
-=~/.emacs.d/ics-calendars.txt=:
-
-#+begin_src text :tangle "~/.emacs.d/ics-calendars.txt"
-<calendar-name> <some-ics-url>
-~/org/work.org
-~/org/home.org
-~/org/fromhome.org
-~/org/notes.org
-#+end_src
-
-All these files will be fetched and reformatted on demand by the
-fetch-calendars.pl script.
-
-*** agenda files
-
-These are your own org-files that you can add to for example:
-
-#+begin_src emacs-lisp
-  ;;'(org-agenda-files (quote ("~/org/notes.org" "~/org/work.org" "~/org/home.org")))
-  (setq org-agenda-files (list "~/org/work.org"
-			       "~/org/notes.org"
-			       "~/org/home.org"
-			       "~/org/fromhome.org"
-))
-  (add-hook 'after-init-hook 'org-agenda-list)
-#+end_src
-
-*** contacts files
-
-You probably want to edit the contacts files.
-
-** cronjob extra
-
-For org-alert to work as intended here, we need to continuously add
-the NEXT todo-keyword in the org-headers when events are within half
-an hour. These needs to be inserted by a perl-script that runs once a
-minute. I also have an ics-calender that I want fetched and updated
-once a minute. To do this I run fetch-calendars.pl which also calls
-out to ical2org.pl and org-schedule.pl and it is org-schedule.pl that
-updates the NEXT header.
-
-As I'm on GuixSD, I run the cronjob by adding the following to
-=~/.config/cron/job.guile=:
-
-#+begin_src emacs-lisp :eval never :tangle ~/.config/cron/job.guile
-;; -*- geiser-scheme-implementation: guile -*-
-;; make sure to add mcron & in ~/.profile
-;; (job '(next-minute (range 0 60 5)) "dosomethingevery5minutes")
-;; (job '(next-minute (range 0 60 10)) "dosomethingevery10minutes")
-(job '(next-minute (range 0 60 1)) "perl ~/src/my-emacs-config/fetch-calendars.pl ~/.emacs.d/ics-calendars.txt ~/.emacs.d/todokeywords.txt")
-#+end_src
-
-and also by adding =mcron &= to =~/.profile=. However, before running
-mcron, make sure to start emacs once first, because the
-todokeywords.txt file is created via an org-mode-hook defined in
-config.org so if you change the path or the hook this cronjob needs
-adjusted as well. The =ics-calendars.txt= file is setup as [[*caldav-conf.el][below]].
-
-
-#+begin_src bash :eval never :tangle ~/.profile
-mcron &
-#+end_src
-
-* First start
-
-First time you open an org-mode buffer you will be prompted to run
-=M-x jedi:install-server= which means press "Alt" and "x" keys
-together then type =jedi:install-server= and hit "Enter" or
-"Return". Due to some weird stuff - possibly with Guix, you should
-exit emacs, run =guix install python-pip=, restart emacs and then
-rerun the command.
