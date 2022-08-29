@@ -11,23 +11,23 @@
 
 #+name:	$2.sh
 #+begin_src bash :tangle src/$2/$2.sh :noweb-ref ""
-  [[ "$_BCU_SH_LOADED" == YES ]] || . bcu.sh
-  _$2_MOD_DIR=\$(dirname "$(readlink -f "\${BASH_SOURCE[0]}")")
-  <<$2.sh.acc>>
-  $2_private(){
+[[ "$_BCU_SH_LOADED" == YES ]] || . bcu.sh
+_$2_MOD_DIR=\$(dirname "$(readlink -f "\${BASH_SOURCE[0]}")")
+#<<$2.sh.acc>>#
+$2_private(){
       :
-  <<$2.sh.acc.priv>>
-  }
-  <<$2-main>>
-  declare -a org_args="\${org_args}"
-  if [ "\${1:-\${org_args[0]}}" != "--source-only" ]; then
-      # \$@ evaluates to all of the arguments passed to the function or script as individual strings.
-      if [[ -n "\$org_args" ]]; then
-	  $2_main "\${org_args[@]}"
-      else
-	  $2_main "\${@}"
-      fi
-  fi
+#<<$2.sh.acc.priv>>#
+}
+#<<$2-main>>#
+declare -a org_args="\${org_args}"
+if [ "\${1:-\${org_args[0]}}" != "--source-only" ]; then
+    # \$@ evaluates to all of the arguments passed to the function or script as individual strings.
+    if [[ -n "\$org_args" ]]; then
+        $2_main "\${org_args[@]}"
+    else
+        $2_main "\${@}"
+    fi
+fi
 #+end_src
 
 **$1 TODO $2-unit-tests						:_module_tests_:
@@ -36,24 +36,24 @@ The collected unit tests of $2
 
 #+name: $2-unit-tests
 #+begin_src bash :tangle src/$2/$2-test.sh :noweb-ref $2-unit-tests :var org_args="()"
-  [[ "$_BCU_SH_LOADED" == YES ]] || . bcu.sh
-  _$2_MOD_DIR=\$(dirname "$(readlink -f "\${BASH_SOURCE[0]}")")
-  $2_private(){
-      :
-  <<$2.sh.acc.priv>>
-  }
-  $2_test_main(){
-  <<$2-tests>>  
-  }
-  declare -a org_args="\${org_args}"
-  if [ "\${1:-\${org_args[0]}}" != "--source-only" ]; then
-      # $@ evaluates to all of the arguments passed to the function or script as individual strings.
-      if [[ -n "\$org_args" ]]; then
-	  $2_test_main "\${org_args[@]}"
-      else
-	  $2_test_main "\${@}"
-      fi
-  fi
+[[ "$_BCU_SH_LOADED" == YES ]] || . bcu.sh
+_$2_MOD_DIR=\$(dirname "$(readlink -f "\${BASH_SOURCE[0]}")")
+$2_private(){
+    :
+#<<$2.sh.acc.priv>>#
+}
+$2_test_main(){
+#<<$2-tests>>#
+}
+declare -a org_args="\${org_args}"
+if [ "\${1:-\${org_args[0]}}" != "--source-only" ]; then
+    # $@ evaluates to all of the arguments passed to the function or script as individual strings.
+    if [[ -n "\$org_args" ]]; then
+        $2_test_main "\${org_args[@]}"
+    else
+        $2_test_main "\${@}"
+    fi
+fi
 #+end_src
 
 **$1 TODO $2-main                                        :_module_main_function_:
@@ -62,8 +62,8 @@ The main function of $2
 
 #+name: $2-main
 #+begin_src bash :noweb-ref "" :var org_args="()"
-  $2_main(){
-      :
-  }
+$2_main(){
+    :
+}
 #+end_src
 $0

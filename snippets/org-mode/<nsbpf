@@ -6,6 +6,7 @@
 ***$1 TODO $2						:_private_function_:
 
 #+name: $2-info
+$6
 
 ****$1 NEXT $2-test					:_private_function_test_:
 :PROPERTIES:
@@ -28,71 +29,71 @@ Test 1 for $2:
 
 #+name: $2-test-1
 #+begin_src bash
-  $2_test_1()(
-      . <($2_test_f)
-      [[ "\${a}" == $4 ]] || { echo FAIL && return 1; }
-      echo PASS && return 0
-  )
+$2_test_1()(
+    . <($2_test_f)
+    [[ "\${a}" == $4 ]] || { echo FAIL && return 1; }
+    echo PASS && return 0
+)
 #+end_src
 
 All tests for the $2 function
 
 #+name: $2-test-main
-#+begin_src bash :tangle src/$5/$2-test.sh :noweb-ref $5-tests :var org_args="()"
-  . bcu.sh
-  <<$2>>
-  <<$2-tests>>
-  $2_test_main(){
-      printf $2_test_1.. ; $2_test_1
-  }
-  declare -a org_args="\${org_args}"
-  if [ "\${1:-\${org_args[0]}}" != "--source-only" ]; then
-      # $@ evaluates to all of the arguments passed to the function or script as individual strings.
-      if [[ -n "\$org_args" ]]; then
-	  $2_test_main "\${org_args[@]}"
-      else
-	  $2_test_main "\${@}"
-      fi
-  fi
+#+begin_src bash :noweb no-export :tangle src/$5/$2-test.sh :noweb-ref $5-tests :var org_args="()"
+. bcu.sh
+#<<$2>>#
+#<<$2-tests>>#
+$2_test_main(){
+    printf $2_test_1.. ; $2_test_1
+}
+declare -a org_args="\${org_args}"
+if [ "\${1:-\${org_args[0]}}" != "--source-only" ]; then
+    # $@ evaluates to all of the arguments passed to the function or script as individual strings.
+    if [[ -n "\$org_args" ]]; then
+        $2_test_main "\${org_args[@]}"
+    else
+        $2_test_main "\${@}"
+    fi
+fi
 #+end_src
 
 ****$1 TODO $2-definition					:_private_function_definition_:
 
 #+name: ${2:enumerate}
-#+begin_src bash :noweb-ref $5.sh.acc.priv :noweb yes
-  bcu__$2(){
-      local _STACK z Options=() Input=() $7
-      [[ "\$1" =~ (-h|--help) ]] && {
-	  local _DESCRIPTION _EXAMPLE	
-      # shellcheck disable=SC2034
-      _DESCRIPTION=\$(cat <<'EOF'
-  <<$2-description()>>
-  EOF
-  )
-      # shellcheck disable=SC2034
-      _EXAMPLE=\$(cat <<'EOF'
-  <<$2-example()>>
-  EOF
-  )
-      }    
-      # Options
-      local null=(z null "" "Read null-separated operands from stdin" 0)    
-      Options+=("(\${null[*]@Q})")
+#+begin_src bash :noweb-ref $5.sh.acc.priv :noweb no-export
+bcu__$2(){
+    local _STACK z Options=() Input=() $7
+    [[ "\$1" =~ (-h|--help) ]] && {
+        local _DESCRIPTION _EXAMPLE
+        # shellcheck disable=SC2034
+        _DESCRIPTION=\$(cat <<'EOF'
+#<<$2-description()>>#
+EOF
+)
+    # shellcheck disable=SC2034
+    _EXAMPLE=\$(cat <<'EOF'
+#<<$2-example()>>#
+EOF
+)
+    }
+    # Options
+    local null=(z null "" "Read null-separated operands from stdin" 0)
+    Options+=("(\${null[*]@Q})")
 
-      # Operands
-      # shellcheck disable=SC2034
-      local -a Operands=(1:t:$7)
+    # Operands
+    # shellcheck disable=SC2034
+    local -a Operands=(1:t:$7)
 
-      # Parse args
-      # shellcheck disable=SC2034
-      [[ ! -t 0 ]] && mapfile -t -d '' Input
-      bcu__setopts "\$@" || {
-          printf '%s' "Parsing input failed: \${_STACK}" && bcu__stack "\$@" && return 1; }
-      [[ "\$1" =~ (-h|--help) ]] && return 0
+    # Parse args
+    # shellcheck disable=SC2034
+    [[ ! -t 0 ]] && mapfile -t -d '' Input
+    bcu__setopts "\$@" || {
+       printf '%s' "Parsing input failed: \${_STACK}" && bcu__stack "\$@" && return 1; }
+    [[ "\$1" =~ (-h|--help) ]] && return 0
 
-      # Check args
-      $0
-  }
+    # Check args
+    $0
+}
 #+end_src
 
 #+name: $2-description
@@ -106,19 +107,19 @@ EOF
 
 #+name: $2-ex
 #+begin_src bash :noweb-ref "" :cache yes :eval query-export
-  $2 $3
+$2 $3
 #+end_src
 
 #+name: $2-example
 #+begin_src bash :noweb-ref "" :cache yes :session :exports none
-  cat <<'EOF'
-  Example:
+cat <<'EOF'
+Example:
 
-      <<$2-ex>>
-  
-  Results:
+    #<<$2-ex>>#
 
-      <<$2-ex()>>
-      
-  EOF
+Results:
+
+    #<<$2-ex()>>#
+
+EOF
 #+end_src

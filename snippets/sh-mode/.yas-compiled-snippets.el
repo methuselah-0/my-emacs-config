@@ -18,4 +18,4 @@
 		       ("ae" "\"\\${$1[@]}\"$0" "ae" nil nil nil "/home/user1/.emacs.d/snippets/sh-mode/array-expansion" nil nil)))
 
 
-;;; Do not edit! File generated at Mon Nov  9 08:03:46 2020
+;;; Do not edit! File generated at Wed Oct 13 10:20:09 2021
