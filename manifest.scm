@@ -306,7 +306,7 @@
         (specification->package "fwknop-client")
         (specification->package "python-vobject")
         (specification->package "python-dateutil")
-        (specification->package "bash-coding-utils")
+        (specification->package "bash-bcu")
         (specification->package "pydaemon")
         (specification->package "tree")
         (list (specification->package "pcre") "bin")
