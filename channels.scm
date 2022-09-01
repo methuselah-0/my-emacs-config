@@ -3,7 +3,7 @@
         (url "https://gitlab.com/methuselah-0/my-guix-packages.git")
         (branch "master")
         (commit
-          "c823da9498008c6e91976f7077a3588653d673dc"))
+          "ba180c2dd3903eddc11d610d259752d1fddfcf2c"))
       (channel
         (name 'guix)
         (url "https://git.savannah.gnu.org/git/guix.git")
