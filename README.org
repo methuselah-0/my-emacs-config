@@ -56,7 +56,8 @@ Then add the config.org file in =~/.emacs.d/config.org=
 ** Add emacs packages
 
 Some are install in elpa directory already. Remaining ones can be
-installed via Guix.
+installed via Guix. You need to install the latest emacs-org-contrib,
+do that with: guix package -i --with-latest emacs-org-contrib.
 
 *** Guix
 
@@ -79,6 +80,11 @@ it with the channels file that comes with this repo:
 
 If this breaks your stuff you might have to fix stuff here before
 continuing.
+
+** Ready to run
+
+For example, add this to your =.bashrc=: ~alias
+emacs='GTK_THEME=Adwaita:dark emacs -mm'~.
 
 ** Special configuration files
 *** caldav-conf.el

@@ -70,11 +70,32 @@
      ("\\?\\?\\?+" . "#dc752f")))
  '(org-re-reveal-script-files '("js/reveal.js"))
  '(package-selected-packages
-   '(flymake-python-pyflakes rope-read-mode ob-ipython ein guix flycheck-pycheckers jedi spacemacs-theme flycheck-pyflakes jupyter anaconda-mode ag ox-reveal ox-hugo ox-gfm org-alert syslog-mode nlinum rainbow-delimiters ac-geiser auto-complete-pcmp auto-complete paredit geiser))
+   '(xref-js2 jedi-direx jedi flymake-python-pyflakes ein rope-read-mode guix flycheck-pycheckers jupyter ob-ipython spacemacs-theme flycheck-pyflakes anaconda-mode ag ox-reveal ox-hugo ox-gfm org-alert syslog-mode nlinum rainbow-delimiters ac-geiser auto-complete-pcmp auto-complete paredit geiser))
  '(pdf-view-midnight-colors '("#b2b2b2" . "#292b2e"))
  '(python-indent-guess-indent-offset-verbose nil)
  '(safe-local-variable-values
-   '((org-repo-nbs-root . /home/user1/src/nbdev-org-babel-example/nbs)
+   '((magit-todos-exclude-globs "elisp-files*" "elpa*")
+     (magit-todos-exclude-globs "elpa*")
+     (eval let
+	   ((root-dir-unexpanded
+	     (locate-dominating-file default-directory ".dir-locals.el")))
+	   (when root-dir-unexpanded
+	     (let*
+		 ((root-dir
+		   (expand-file-name root-dir-unexpanded))
+		  (root-dir*
+		   (directory-file-name root-dir)))
+	       (unless
+		   (boundp 'geiser-guile-load-path)
+		 (defvar geiser-guile-load-path 'nil))
+	       (make-local-variable 'geiser-guile-load-path)
+	       (require 'cl-lib)
+	       (cl-pushnew root-dir* geiser-guile-load-path :test #'string-equal))))
+     (eval setq-local guix-directory
+	   (locate-dominating-file default-directory ".dir-locals.el"))
+     (org-babel-noweb-wrap-end . "&gt;&gt;#")
+     (org-babel-noweb-wrap-start . "#&lt;&lt;")
+     (org-repo-nbs-root . /home/user1/src/nbdev-org-babel-example/nbs)
      (org-repo-root . /home/user1/src/nbdev-org-babel-example)
      (org-repo-root . /home/user1/src/nbdev-projects/awesomelib)
      (org-repo-root . "../../")
@@ -93,7 +114,8 @@
      (eval modify-syntax-entry 36 "'")
      (eval modify-syntax-entry 126 "'")))
  '(smtpmail-smtp-server "mail.selfhosted.xyz")
- '(smtpmail-smtp-service 25))
+ '(smtpmail-smtp-service 25)
+ '(vc-follow-symlinks nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
