@@ -1,10 +1,67 @@
-* How to install
+* About
+
+This is an emacs configuration suitable for terminal use that's
+focused on supporting org mode, literal programming, and the languages
+python, javascript and guile. It assists in setting up a nice-looking
+editor with easy navigation and auto-completion, that just works.
+
+The init.el evaluates the emacs-lisp code-blocks in the config.org
+file.
+
+By following the installation instructions, it will also guide you
+through setting up emacs-webkit which is a modern web-browser usable
+from inside emacs.
+
+The setup includes the following things, etc:
+  - elpy
+  - auto-complete
+  - jedi, customized
+  - sidebar.el
+  - diff-hl-mode
+  - magit
+  - windmove
+  - flycheck
+  - jupyter
+  - org-mode
+    - org-babel
+    - ...
+    - 
+
+** python use
+
+M-. for go-to-definition
+C-d for documentation
+
+See more under [[file:config.org::*Programming][Programming]], and [[file:config.org::*Python][Python]].
+
+** javascript use
+
+To setup the tern backend for javascript auto-completion:
+  1. ensure to add ~/src/my-emacs-config/node_modules to NODE_PATH
+  2. add ~/src/my-emacs-config/node_modules/.bin to PATH
+  3. add a .tern-project file in your javascript folders.
+
+You have C-d for documentation of the completion options.
+
+See more under [[file:config.org::*Programming][Programming]], and [[file:config.org::*Javascript][Javascript]].
+
+* The installation
+
+Warning: below method works well but it's not fool-proof and you mave
+have to fix something yourself. I'm working on getting it more
+automated.
+
+To complete the setup You need to:
+  - install guix and some custom guix channels
+  - install many guix packages
+  - manually install some elisp packages not available in melpa.
+
 ** Download this repo
 
 The easiest thing is to download it to =~/src/my-emacs-config=, since
 there are some hardcoded paths in this setup.
 
-#+begin_src bash
+#+begin_src bash :tangle install.sh
   mkdir -p ~/src
   cd ~/src
   git clone https://github.com/methuselah-0/my-emacs-config.git
@@ -14,9 +71,9 @@ there are some hardcoded paths in this setup.
 
 For example, by:
 
-#+begin_src bash :eval never
-  mv ~/.emacs ~/.emacs.bak
-  mv ~/.emacs.d ~/.emacs.d.bak
+#+begin_src bash :tangle install.sh
+  [[ -e ~/.emacs ]] && mv ~/.emacs ~/.emacs.bak.$$
+  [[ -e ~/.emacs.d ]] && mv ~/.emacs.d ~/.emacs.d.bak.$$
 #+end_src
 
 ** Create new ~/.emacs.d
@@ -26,7 +83,7 @@ For example, by:
 Create the directory =~/.emacs.d= and link in init.el that will load
 the file =~/.emacs.d/config.org=:
 
-#+begin_src bash
+#+begin_src bash :tangle install.sh
   mkdir -p ~/.emacs.d
   ln -s ~/src/my-emacs-config/init.el ~/.emacs.d/init.el
 #+end_src
@@ -35,55 +92,212 @@ the file =~/.emacs.d/config.org=:
 
 Then add the config.org file in =~/.emacs.d/config.org=
 
-#+begin_src bash
+#+begin_src bash :tangle install.sh
   ln -s ~/.emacs.d/config.org ~/src/my-emacs-config/config.org
 #+end_src
 
 *** symlink the elpa, elisp-files and snippets directories
 
-#+begin_src bash
+#+begin_src bash :tangle install.sh
   ln -s ~/src/my-emacs-config/elpa ~/.emacs.d/elpa
   ln -s ~/src/my-emacs-config/elisp-files ~/.emacs.d/elisp-files
   ln -s ~/src/my-emacs-config/snippets ~/.emacs.d/snippets
 #+end_src
 
-** Install tern via npm
+** TODO Guix packages
+Need to update this section some but should work fine regardless.
 
-#+begin_src bash
-  sudo npm install --prefix ~/src/my-emacs-config/ tern
-#+end_src
+We need special channels (not anymore?)
 
-** Add emacs packages
-
-Some are install in elpa directory already. Remaining ones can be
-installed via Guix. You need to install the latest emacs-org-contrib,
-do that with: guix package -i --with-latest emacs-org-contrib.
-
-*** Guix
-
-If you don't have guix installed you can install it as a stand-alone
-distro or as a package manager. Find guix-install.sh to try it out on
-a "foreign distro". Make sure to run ~guix pull~ as both root and your
-normal user before continuing. If you already have Guix installed, you
-can just continue.
-
-*** install emacs packages via Guix manifest
-
-You could modify the manifest to your liking, perhaps merge and fix
-with your own current list of packages or manifest. When done, apply
-it with the channels file that comes with this repo:
-
-#+begin_src bash
+#+begin_src bash :tangle install.sh
   guix pull -C ~/src/my-emacs-config/channels.scm
-  guix package --fallback -m ~/src/my-emacs-config/manifest.scm
 #+end_src
 
 If this breaks your stuff you might have to fix stuff here before
 continuing.
 
+Below command creates should be enough to install most of the
+necessary emacs packages on guix:
+
+#+begin_src bash :tangle install.sh
+guix package -i emacs-org-contrib the-silver-searcher python-dateutil python-vobject emacs-xmlgen emacs-tramp emacs-scheme-complete emacs-rudel emacs-realgud emacs-rainbow-delimiters emacs-nginx-mode emacs-bash-completion emacs-wget emacs-w3m emacs-pdf-tools emacs-emms emacs emacs-php-mode emacs-org-tree-slide emacs-org-bullets emacs-org emacs-org-contrib emacs-geiser emacs-flycheck emacs-ag emacs-ox-pandoc emacs-org-caldav emacs-lispy emacs-guix python-pycrypto python-pydotplus python-netaddr python-bash-kernel python-mysqlclient python-flask-sqlalchemy python-virtualenv python-trepan3k python-pytest python-yq python-jedi python-pylint python-epc emacs-ac-geiser emacs-auto-complete emacs-jupyter emacs-slime emacs-eldoc emacs-doom-themes emacs-treemacs emacs-treemacs-extra emacs-all-the-icons emacs-magit emacs-magit-todos emacs-magit-org-todos-el emacs-test-simple emacs-browse-at-remote emacs-posframe python-wrapper emacs-js2-refactor-el emacs-js2-mode emacs-elpy emacs-company-quickhelp emacs-company jupyter-next python-flake8 python-mypy python-flit python-nbdev python-quarto python-i3ipc emacs-diff-hl python-toolz emacs-pgtk-native-comp emacs-flycheck-pycheckers emacs-dash emacs-s emacs-ov emacs-projectile emacs-frame-local perl perl-data perl-datetime-format-ical perl-data-ical pandoc xlsfonts font-ghostscript font-adobe-source-code-pro font-anonymous-pro font-awesome font-bitstream-vera font-dejavu font-fantasque-sans font-fira-mono font-gnu-freefont font-gnu-unifont font-go font-google-material-design-icons font-google-noto font-google-roboto font-hack font-inconsolata font-liberation font-linuxlibertine font-mathjax font-rachana font-tamzen font-terminus font-tex-gyre font-un texinfo texlive texlive-latex-preview zathura zathura-pdf-mupdf webkitgtk-with-libsoup2 gst-libav gst-plugins-ugly gst-plugins-bad gst-plugins-good gst-plugins-base gstreamer gst-plugins-good-qt gcc-toolchain
+#+end_src
+
+Or you can install this manifest (DEPRECATED):
+
+#+begin_src bash :tangle install-manifest.sh
+cat <<'EOF' > /tmp/my_new_emacs_manifest.scm
+(use-modules (guix transformations))
+(define transform1
+  (options->transformation
+    '((with-latest . "emacs-org-contrib"))))
+(packages->manifest
+  (list (specification->package "the-silver-searcher")
+        (specification->package "python-dateutil")
+        (specification->package "python-vobject")
+        (specification->package "emacs-xmlgen")
+        (specification->package "emacs-tramp")
+        (specification->package "emacs-scheme-complete")
+        (specification->package "emacs-rudel")
+        (specification->package "emacs-realgud")
+        (specification->package "emacs-rainbow-delimiters")
+        (specification->package "emacs-nginx-mode")
+        (specification->package "emacs-bash-completion")
+        (specification->package "emacs-wget")
+        (specification->package "emacs-w3m")
+        (specification->package "emacs-pdf-tools")
+        (specification->package "emacs-emms")
+        (specification->package "emacs")
+        (specification->package "emacs-php-mode")
+        (specification->package "emacs-org-tree-slide")
+        (specification->package "emacs-org-bullets")
+        (specification->package "emacs-org")
+        (transform1
+          (specification->package "emacs-org-contrib"))
+        (specification->package "emacs-geiser")
+        (specification->package "emacs-flycheck")
+        (specification->package "emacs-ag")
+        (specification->package "emacs-ox-pandoc")
+        (specification->package "emacs-org-caldav")
+        (specification->package "emacs-lispy")
+        (specification->package "emacs-guix")
+        (specification->package "python-pycrypto")
+        (specification->package "python-pydotplus")
+        (specification->package "python-netaddr")
+        (specification->package "python-bash-kernel")
+        (specification->package "python-mysqlclient")
+        (specification->package "python-flask-sqlalchemy")
+        (specification->package "python-virtualenv")
+        (specification->package "python-trepan3k")
+        (specification->package "python-pytest")
+        (specification->package "python-yq")
+        (specification->package "python-jedi")
+        (specification->package "python-pylint")
+        (specification->package "python-epc")
+        (specification->package "emacs-ac-geiser")
+        (specification->package "emacs-auto-complete")
+        (specification->package "emacs-jupyter")
+        (specification->package "emacs-slime")
+        (specification->package "emacs-eldoc")
+        (specification->package "emacs-doom-themes")
+        (specification->package "emacs-treemacs")
+        (specification->package "emacs-treemacs-extra")
+        (specification->package "emacs-all-the-icons")
+        (specification->package "emacs-magit")
+        (specification->package "emacs-magit-todos")
+        (specification->package "emacs-magit-org-todos-el")
+        (specification->package "emacs-test-simple")
+        (specification->package "emacs-browse-at-remote")
+        (specification->package "emacs-posframe")
+        (specification->package "python-wrapper")
+        (specification->package "emacs-js2-refactor-el")
+        (specification->package "emacs-js2-mode")
+        (specification->package "emacs-elpy")
+        (specification->package "emacs-company-quickhelp")
+        (specification->package "emacs-company")
+        (specification->package "jupyter-next")
+        (specification->package "python-flake8")
+        (specification->package "python-mypy")
+        (specification->package "python-flit")
+        (specification->package "python-nbdev")
+        (specification->package "python-quarto")
+        (specification->package "python-i3ipc")
+        (specification->package "emacs-diff-hl")
+        (specification->package "python-toolz")
+        (specification->package "emacs-pgtk-native-comp")
+        (specification->package "emacs-flycheck-pycheckers")
+        (specification->package "emacs-dash")
+        (specification->package "emacs-s")
+        (specification->package "emacs-ov")
+        (specification->package "emacs-projectile")
+        (specification->package "emacs-frame-local")
+        (specification->package "perl")
+        (specification->package "perl-data")
+        (specification->package
+          "perl-datetime-format-ical")
+        (specification->package "perl-data-ical")
+        (specification->package "pandoc")
+        (specification->package "xlsfonts")
+        (specification->package "font-ghostscript")
+        (specification->package
+          "font-adobe-source-code-pro")
+        (specification->package "font-anonymous-pro")
+        (specification->package "font-awesome")
+        (specification->package "font-bitstream-vera")
+        (specification->package "font-dejavu")
+        (specification->package "font-fantasque-sans")
+        (specification->package "font-fira-mono")
+        (specification->package "font-gnu-freefont")
+        (specification->package "font-gnu-unifont")
+        (specification->package "font-go")
+        (specification->package
+          "font-google-material-design-icons")
+        (specification->package "font-google-noto")
+        (specification->package "font-google-roboto")
+        (specification->package "font-hack")
+        (specification->package "font-inconsolata")
+        (specification->package "font-liberation")
+        (specification->package "font-linuxlibertine")
+        (specification->package "font-mathjax")
+        (specification->package "font-rachana")
+        (specification->package "font-tamzen")
+        (specification->package "font-terminus")
+        (specification->package "font-tex-gyre")
+        (specification->package "font-un")
+        (specification->package "texinfo")
+        (specification->package "texlive")
+        (specification->package "texlive-latex-preview")
+        (specification->package "zathura")
+        (specification->package "zathura-pdf-mupdf")
+))
+EOF
+guix package -m /tmp/my_new_emacs_manifest.scm
+#+end_src
+
+#+RESULTS:
+
+** Install tern via npm
+
+#+begin_src bash :tangle install.sh
+  npm install --prefix ~/src/my-emacs-config/ tern
+#+end_src
+
+** Manually install some emacs packages
+You need to install the following emacs packages yourself:
+
++ icons-in-terminal
++ sidebar.el
++ font-lock+
++ emacs-webkit
+
+git clone them to =~/src=, then install icons-in-terminal via it's
+shell-script install file:
+
+#+begin_src bash :tangle install.sh
+mkdir -p ~/src
+cd ~/src
+git clone https://github.com/sebastiencs/icons-in-terminal.git
+git clone https://github.com/sebastiencs/sidebar.el.git
+#wget "https://www.emacswiki.org/emacs/download/font-lock%2b.el"
+cd ~/src/icons-in-terminal && ./install.sh
+#+end_src
+
+After that visit the file =~/src/sidebar.el/sidebar.el= and run =M-x
+package-install-from-buffer=, and the same for font-lock+ which is
+located in the =~/src/my-emacs-config/elisp-files= directory.
+
+You need to download and compile emacs-webkit:
+
+#+begin_src emacs-lisp
+cd ~/src/my-emacs-config/
+git clone https://github.com/akirakyle/emacs-webkit.git
+cd emacs-webkit
+CC=gcc make
+#+end_src
+
 ** Ready to run
 
-For example, add this to your =.bashrc=: ~alias
+For gui example, add this to your =.bashrc=: ~alias
 emacs='GTK_THEME=Adwaita:dark emacs -mm'~.
 
 ** Special configuration files
@@ -128,7 +342,7 @@ you can at least fetch to org-format. Create the file
 #+end_src
 
 All these files will be fetched and reformatted on demand by the
-fetch-calendars.pl script.
+fetch-calendars.pl script, if you set it up, see [[*cronjob extra][cronjob extra]].
 
 *** agenda files
 
@@ -235,7 +449,7 @@ In org-alert.el, the following changes were made:
 
 ** cronjob for org-alert and org-caldav
 
-See [[*cronjob extra][here]] under [[*How to install][How to install]].
+See [[*cronjob extra][here]] under [[*The installation][The installation]].
 
 ** reveal.js
 

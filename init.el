@@ -70,11 +70,42 @@
      ("\\?\\?\\?+" . "#dc752f")))
  '(org-re-reveal-script-files '("js/reveal.js"))
  '(package-selected-packages
-   '(xref-js2 jedi-direx jedi flymake-python-pyflakes ein rope-read-mode guix flycheck-pycheckers jupyter ob-ipython spacemacs-theme flycheck-pyflakes anaconda-mode ag ox-reveal ox-hugo ox-gfm org-alert syslog-mode nlinum rainbow-delimiters ac-geiser auto-complete-pcmp auto-complete paredit geiser))
+   '(sql-indent xref-js2 jedi-direx jedi flymake-python-pyflakes ein rope-read-mode guix flycheck-pycheckers jupyter ob-ipython spacemacs-theme flycheck-pyflakes anaconda-mode ag ox-reveal ox-hugo ox-gfm org-alert syslog-mode nlinum rainbow-delimiters ac-geiser auto-complete-pcmp auto-complete paredit geiser))
  '(pdf-view-midnight-colors '("#b2b2b2" . "#292b2e"))
  '(python-indent-guess-indent-offset-verbose nil)
  '(safe-local-variable-values
-   '((magit-todos-exclude-globs "elisp-files*" "elpa*")
+   '((eval progn
+	   (require 'lisp-mode)
+	   (defun emacs27-lisp-fill-paragraph
+	       (&optional justify)
+	     (interactive "P")
+	     (or
+	      (fill-comment-paragraph justify)
+	      (let
+		  ((paragraph-start
+		    (concat paragraph-start "\\|\\s-*\\([(;\"]\\|\\s-:\\|`(\\|#'(\\)"))
+		   (paragraph-separate
+		    (concat paragraph-separate "\\|\\s-*\".*[,\\.]$"))
+		   (fill-column
+		    (if
+			(and
+			 (integerp emacs-lisp-docstring-fill-column)
+			 (derived-mode-p 'emacs-lisp-mode))
+			emacs-lisp-docstring-fill-column fill-column)))
+		(fill-paragraph justify))
+	      t))
+	   (setq-local fill-paragraph-function #'emacs27-lisp-fill-paragraph))
+     (eval with-eval-after-load 'yasnippet
+	   (let
+	       ((guix-yasnippets
+		 (expand-file-name "etc/snippets/yas"
+				   (locate-dominating-file default-directory ".dir-locals.el"))))
+	     (unless
+		 (member guix-yasnippets yas-snippet-dirs)
+	       (add-to-list 'yas-snippet-dirs guix-yasnippets)
+	       (yas-reload-all))))
+     (eval add-to-list 'completion-ignored-extensions ".go")
+     (magit-todos-exclude-globs "elisp-files*" "elpa*")
      (magit-todos-exclude-globs "elpa*")
      (eval let
 	   ((root-dir-unexpanded
@@ -121,4 +152,5 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(popup-face ((t (:foreground "cyan"))))
+ '(popup-tip-face ((t (:foreground "cyan")))))

@@ -7,28 +7,30 @@
     (insert-file-contents filePath)
     (split-string (buffer-string) "\n" t)))
 
-(if (file-exists-p "/home/user1/.emacs.d/name.txt")
-    (let ((a (read-lines "/home/user1/.emacs.d/name.txt")))
+(if (file-exists-p "~/.emacs.d/name.txt")
+    (let ((a (read-lines "~/.emacs.d/name.txt")))
       (let
 	  ((name (car a))
 	   (email (cadr a)))
 	(setq user-full-name name)
-	(setq user-mail-address email))))
+	(setq user-mail-address email)))
+  (interactive)
+  (setq user-full-name (read-string "Enter name:"))
+  (setq user-mail-address (read-string "Enter email-address:"))
+  (message "Write your name and email address to 2 separate lines in ~/.emacs.d/name.txt to avoid this question on next start"))
 #+end_src
+
+* Guix
 
 https://emacs-guix.gitlab.io/website/manual/latest/emacs-guix.html
 
 #+BEGIN_SRC emacs-lisp
-(setq user-full-name "David Larsson")
-(setq user-mail-address "david.larsson@selfhosted.xyz")
 ;; Assuming the Guix checkout is in ~/src/guix.
 (if (file-exists-p "~/src/guix/etc/copyright.el")
     (load-file "~/src/guix/etc/copyright.el"))
 ;;(load-file "~/src/guix/etc/copyright.el")
 (require 'guix-autoloads nil t)
 #+END_SRC
-
-* Guix
 
 #+BEGIN_SRC emacs-lisp
 ;; Assuming the Guix checkout is in ~/src/guix.
@@ -54,9 +56,6 @@ Directory for installing and loading individual lisp-extensions:
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path "~/.emacs.d/elisp-files/")
 #+END_SRC
-
-(add-to-list 'load-path "~/bin/webkit_emacs/")
-;(load "webkit.el")
 
 This subdir loading doesn't work :/
 
@@ -109,6 +108,54 @@ link]].
 
 
 * Layout, startup etc.
+
+Windmove let's you move window frames with SHIFT+<arrow-key>
+
+#+begin_src emacs-lisp
+(windmove-default-keybindings)
+;; (global-set-key [(meta shift j)]  'windmove-left)
+;; (global-set-key [(meta shift l)]  'windmove-right)
+;; (global-set-key [(meta shift i)]  'windmove-up)
+;; (global-set-key [(meta shift k)]  'windmove-down)
+(global-set-key (kbd "M-<left>") 'windmove-left)
+(global-set-key (kbd "M-<right>") 'windmove-right)
+(global-set-key (kbd "M-<up>") 'windmove-up)
+(global-set-key (kbd "M-<down>") 'windmove-down)
+#+end_src
+
+Set terminus font (see [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Fonts.html][manual page]]).
+
+#+begin_src emacs-lisp
+(add-to-list 'default-frame-alist
+             '(font . "Terminus"))
+;             '(font . "DejaVu Sans Mono-10"))
+#+end_src
+
+Use UTF8 everywhere, from [[https://thraxys.wordpress.com/2016/01/13/utf-8-in-emacs-everywhere-forever/][this blogpost]].
+
+#+begin_src emacs-lisp
+(setq locale-coding-system 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-selection-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-language-environment 'utf-8)
+(prefer-coding-system 'utf-8)
+(when (display-graphic-p)
+   (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
+#+end_src
+
+
+Use sidebar.el
+
+#+begin_src emacs-lisp
+(add-to-list 'load-path "~/.local/share/icons-in-terminal/")
+(add-to-list 'load-path "~/src/sidebar.el")
+(require 'sidebar)
+(global-set-key (kbd "C-x C-f") 'sidebar-open)
+(global-set-key (kbd "C-x C-a") 'sidebar-buffers-open)
+;;(require 'icons-in-terminal)
+#+END_SRC
 
 This only works in GUI mode
 
@@ -190,7 +237,30 @@ one such instance. If there is more than one, they won't work right.
   ;; (custom-set-faces)
 #+END_SRC
 
-* Media - EMMS
+* Web, Media, Pdf
+** TODO Webkit
+
+https://github.com/akirakyle/emacs-webkit
+
+emacs-webkit requires at least Emacs 28
+
+"Make sure you have gcc, pkg-config, gtk3, glib-networking, and of
+course webkitgtk installed. Then just run make to make
+webkit-module.so."
+
+#+emacs-lisp
+(add-to-list 'load-path "/home/user1/src/my-emacs-config/emacs-webkit")
+(module-load "/home/user1/src/my-emacs-config/emacs-webkit/webkit-module.so")
+(require 'webkit)
+(global-set-key (kbd "s-b") 'webkit) ;; Bind to whatever global key binding you want if you want
+(require 'webkit-ace) ;; If you want link hinting
+(require 'webkit-dark) ;; If you want to use the simple dark mode
+#+end_src
+
+
+;(load "webkit.el")
+
+** EMMS
 ; emms, see: https://www.gnu.org/software/emms/quickstart.html
 ;(add-to-list 'load-path "~/.emacs.d/elisp-files/emms/")
 ;(require 'emms-setup)
@@ -202,9 +272,8 @@ one such instance. If there is more than one, they won't work right.
 ;(require 'emms-player-mpv)
 ;(add-to-list 'emms-player-list 'emms-player-mpv)
 
-* pdf tools
+** pdf tools
 ; pdf-tools specific from https://github.com/politza/pdf-tools/issues/128
-
 
 #+BEGIN_SRC emacs-lisp
   ;; ;;; Begin Code Here ;;;
@@ -228,7 +297,23 @@ one such instance. If there is more than one, they won't work right.
 #+END_SRC
 
 * Programming
+** sql
+
+#+begin_src emacs-lisp
+(add-hook 'sql-mode-hook '(lambda () (sqlind-minor-mode 1)))
+#+end_src
+
 ** general
+
+remember you can use ~M-x list-flycheck-errors~ to get the errors
+described in the minibuffer in case you have the
+flycheck-indication-mode set to left-margin and that conflicts with
+diff-hl-margin-mode's error indication in the same place.
+
+#+begin_src emacs-lisp
+(global-diff-hl-mode)
+(diff-hl-margin-mode)
+#+end_src
 
 browse-at-remote lets you open-in-a-browser the file that is open in
 the buffer at the same line number you are currently at - occasionally
@@ -280,6 +365,190 @@ https://www.emacswiki.org/emacs/ParEdit
 #+END_SRC
 
 ** Python
+*** Fixing jedi and jupyter
+
+**** jedi-core.el
+
+In jedi-core.el
+https://github.com/tkf/emacs-jedi/pull/350
+
+**** jedi:-buffer-file-name
+
+Should look like this so you can get completions from org-babel source buffers:
+
+#+begin_src text
+(defun jedi:-buffer-file-name ()
+  "Return `buffer-file-name' without text properties.
+See: https://github.com/tkf/emacs-jedi/issues/54"
+  (substring-no-properties (or (if (string-match "\*Org Src" (buffer-name (current-buffer)))
+                                   (buffer-file-name (org-src-source-buffer))
+                                 (buffer-file-name))
+                               "")))
+#+end_src
+
+**** jedi:call-deferred
+
+Specifically in jedi:call-deferred this part should be removed:
+
+#+begin_src text
+  (let ((source      (buffer-substring-no-properties (point-min) (point-max)))
+        (source-path (jedi:-buffer-file-name))
+        ;; line=0 is an error for jedi, but is possible for empty buffers.
+        (line        (max 1 (count-lines (point-min) (min (1+ (point)) (point-max)))))
+        (column      (- (point) (line-beginning-position))))
+    (epc:call-deferred (jedi:get-epc)
+                       method-name
+                       (list source line column source-path))))
+#+end_src
+
+and replaced with:
+
+#+begin_src text
+ (with-current-buffer (if (string-match "\*Org Src" (buffer-name (current-buffer)))
+                           (org-src-source-buffer)
+                         (current-buffer))
+    (let ((source      (buffer-substring-no-properties (point-min) (point-max)))
+          ;; line=0 is an error for jedi, but is possible for empty buffers.
+          (line        (max 1 (count-lines (point-min) (min (1+ (point)) (point-max)))))
+          (column      (- (point) (line-beginning-position)))
+          (source-path (jedi:-buffer-file-name)))
+      (epc:call-deferred (jedi:get-epc)
+                         method-name
+                         (list source line column source-path)))))
+#+end_src
+
+**** ob-jupyter.el
+
+In ob-jupyter.el:
+
+;; When editing source-blocks and hitting <return>, a new
+;; source-buffer will be opened and block the editing in the current
+;; org-buffer, without switching over to the new buffer. To fix this, we
+;; can define:
+
+#+begin_src text
+(defun org-babel-edit-prep:jupyter-python (info)
+  "Prepare the edit buffer according to INFO.
+Enable `jupyter-repl-interaction-mode' in the edit buffer
+associated with the session found in INFO.
+
+If the session is a Jupyter TRAMP file name, the
+`default-directory' of the edit buffer is set to the root
+directory the notebook serves."
+  (let* ((params (nth 2 info))
+         (session (alist-get :session params))
+         (client-buffer (org-babel-jupyter-initiate-session session params)))
+    (jupyter-repl-associate-buffer client-buffer)
+    (when (jupyter-tramp-file-name-p session)
+      (setq default-directory (concat (file-remote-p session) "/")))))
+
+
+;; When using (org-babel-jupyter-override-src-block "python") we need
+;; this function to be defined because it won't find the above one:
+(defun org-babel-execute:jupyter-python (body params)
+  "Execute BODY according to PARAMS.
+BODY is the code to execute for the current Jupyter `:session' in
+the PARAMS alist."
+  (let ((result-params (assq :result-params params))
+        (async-p (or (equal (alist-get :async params) "yes")
+                     (plist-member params :async))))
+    (when (member "replace" result-params)
+      (org-babel-jupyter-cleanup-file-links))
+    (let* ((org-babel-jupyter-current-src-block-params params)
+           (session (alist-get :session params))
+           (buf (org-babel-jupyter-initiate-session session params))
+           (jupyter-current-client (buffer-local-value 'jupyter-current-client buf))
+           (lang (jupyter-kernel-language jupyter-current-client))
+           (vars (org-babel-variable-assignments:jupyter params lang))
+           (code (progn
+                   (when-let* ((dir (alist-get :dir params)))
+                     ;; `default-directory' is already set according
+                     ;; to :dir when executing a source block.  Set
+                     ;; :dir to the absolute path so that
+                     ;; `org-babel-expand-body:jupyter' does not try
+                     ;; to re-expand the path. See #302.
+                     (setf (alist-get :dir params) default-directory))
+                   (org-babel-expand-body:jupyter body params vars lang))))
+      (pcase-let ((`(,req ,maybe-result)
+                   (org-babel-jupyter--execute code async-p)))
+        ;; KLUDGE: Remove the file result-parameter so that
+        ;; `org-babel-insert-result' doesn't attempt to handle it while
+        ;; async results are pending.  Do the same in the synchronous
+        ;; case, but not if link or graphics are also result-parameters,
+        ;; only in Org >= 9.2, since those in combination with file mean
+        ;; to interpret the result as a file link, a useful meaning that
+        ;; doesn't interfere with Jupyter style result insertion.
+        ;;
+        ;; Do this after sending the request since
+        ;; `jupyter-generate-request' still needs access to the :file
+        ;; parameter.
+        (when (and (member "file" result-params)
+                   (or async-p
+                       (not (or (member "link" result-params)
+                                (member "graphics" result-params)))))
+          (org-babel-jupyter--remove-file-param params))
+        (prog1 maybe-result
+          ;; KLUDGE: Add the "raw" result parameter for non-inline
+          ;; synchronous results because an Org formatted string is
+          ;; already returned in that case and
+          ;; `org-babel-insert-result' should not process it.
+          (unless (or async-p
+                      (jupyter-org-request-inline-block-p req))
+            (nconc (alist-get :result-params params) (list "raw"))))))))
+#+end_src
+
+emacs-deferred is buggy - find all guix packages emacs-* using that
+adds emacs-deferred by using guix graph <pkg> and remove them. Then
+install the following packages at minimum:
+
+emacs            	28.1   	out	/gnu/store/w0ssipd06il3kvyvqihpmw4lwbhwwfq3-emacs-28.1
+python-virtualenv	20.3.1 	out	/gnu/store/40c42833x4wsddchwpxhilzp9v26h8m7-python-virtualenv-20.3.1
+jupyter          	1.0.0  	out	/gnu/store/gl7fw3r3j9q5wwvv286zrmkffriyq5lw-jupyter-1.0.0
+python-wrapper   	3.9.9  	out	/gnu/store/1m48ama708vh9cjn79yw6cj8sgg7pa1b-python-wrapper-3.9.9
+emacs-zmq        	0.10.10	out	/gnu/store/x923id4s5xcs7dyarl7gzjam48q96sfq-emacs-zmq-0.10.10
+python-netaddr   	0.8.0  	out	/gnu/store/d5h40v3az2l27vv141psd2agvsc6fbi6-python-netaddr-0.8.0
+
+*** elpy
+
+elpy-enable must be run before elpy-mode works.
+
+flycheck-pycheckers is better than flymake so replace flymake with
+flycheck when possible.
+
+create a custom before-save-hook that runs the black code formatter.
+
+remove highlight-indentation-mode from elpy-modules, because when in
+the terminals it looks weird, and also not that important because
+auto-indentation exists, etc.
+
+#+begin_src emacs-lisp
+(elpy-enable)
+(setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+(setq elpy-modules (delq 'elpy-module-highlight-indentation elpy-modules))
+(add-hook 'elpy-mode-hook (lambda ()
+                            (add-hook 'before-save-hook
+                                      'elpy-black-fix-code nil t)))
+(when (load "flycheck" t t) (add-hook 'elpy-mode-hook 'flycheck-mode))
+;;(add-hook 'python-mode-hook 'elpy-mode)
+
+(defun elpy-goto-definition-or-rgrep ()
+  "Go to the definition of the symbol at point, if found. Otherwise, run `elpy-rgrep-symbol'."
+    (interactive)
+    (ring-insert find-tag-marker-ring (point-marker))
+    (condition-case nil (elpy-goto-definition)
+        (error (elpy-rgrep-symbol
+                   (concat "\\(def\\|class\\)\s" (thing-at-point 'symbol) "(")))))
+(define-key elpy-mode-map (kbd "M-.") 'elpy-goto-definition-or-rgrep)
+#+end_src
+
+*** auto-complete and quickhelp-time
+
+This sets how long it takes before the documentation pops up next to
+an auto-complete suggestion.
+
+#+begin_src emacs-lisp
+(setq ac-quick-help-delay 0.05)
+#+end_src
 
 *** fix indent-offset error thing 
 
@@ -337,6 +606,12 @@ Instead try ein:
 
 or try ob-ipython
 
+*** org-export to confluence wiki markup
+
+#+begin_src emacs-lisp
+(require 'ox-confluence-en)
+#+end_src
+
 *** org-export to ipynb: ox-ipynb
 
 And export to jupyter:
@@ -345,7 +620,7 @@ And export to jupyter:
 (require 'ox-ipynb)
 #+end_src
 
-*** flymake-python-pyflakes and eldoc
+*** flycheck-python-pyflakes and eldoc
 
 You must go to your project directory and run ~pylint
 --generate-rcfile > .pylintrc~, then fix the ~init-hook~ line like
@@ -353,8 +628,11 @@ this: ~init-hook='import sys; sys.path.append("<path to folder your
 module is in>")'~
 
 #+begin_src emacs-lisp
-(global-flycheck-mode 1)
-(with-eval-after-load 'flycheck (add-hook 'flycheck-mode-hook #'flycheck-pycheckers-setup))
+;;(global-flycheck-mode 1)
+;;(defvar flycheck-pycheckers-command
+;;  (executable-find (concat (file-name-directory (or load-file-name buffer-file-name))
+;;                           "bin/pycheckers")))
+;;(with-eval-after-load 'flycheck (add-hook 'flycheck-mode-hook #'flycheck-pycheckers-setup))
 #+end_src
 
 **** old flymake related setup
@@ -769,7 +1047,7 @@ Geiser-AC. Automatically enable ac-geiser.
 
 ** Javascript
 
-With xref-js2 you can use ~M-.~ to jump to definition, =M-=, to jump
+With xref-js2 you can use ~M-.~ to jump to definition, =M-,= to jump
 back, and ~M-?~ to find references.
 
 You can also use ~M-x RET tern-show-docs~ etc.
@@ -826,6 +1104,14 @@ org-mode agenda file via say ical2org script/cronjob:
 
 #+begin_src emacs-lisp
 (add-hook 'org-mode-hook 'auto-revert-mode)
+#+end_src
+
+This is needed to ensure correct indentation is used inside src-blocks
+
+#+begin_src emacs-lisp
+(setq org-src-tab-acts-natively t)
+(setq org-src-preserve-indentation t)
+(setq org-src-fontify-natively t)
 #+end_src
 
 ** Variables
@@ -1068,7 +1354,7 @@ Org-Mode agenda
 Org-mode contacts
 
 #+BEGIN_SRC emacs-lisp
-;;(require 'org-contacts)
+;;(require 'org-conactts)
 ;;(setq org-contacts-files '("~/org/contacts.org"))
 ;; (add-to-list 'org-capture-templates
 ;; '("c" "Contacts" entry (file "~/org/contacts.org")
@@ -1281,11 +1567,15 @@ for specific lisp Implementation
 (setq geiser-default-implementation 'guile)
 #+end_src
 
+prevent demoting heading also shifting text inside sections
+
+#+begin_src emacs-lisp
+(setq org-adapt-indentation nil)
+#+end_src
+
 #+begin_src emacs-lisp
 ;;(setq org-src-preserve-indentation t)
 #+end_src
-
-
 
 * Presentation
 
@@ -1303,6 +1593,12 @@ https://gitlab.com/oer/org-re-reveal
 #+end_src
 
 * Background and transparency
+
+** Set a background color
+
+#+begin_src
+;;(set-background-color "#000000")
+#+end_src
 
 ** Set a background image
 
@@ -1537,11 +1833,12 @@ guix install emacs-posframe
 From: https://github.com/andreyorst/dotfiles/blob/740d346088ce5a51804724659a895d13ed574f81/.config/emacs/README.org#theme
 
 #+begin_src emacs-lisp
-(load-theme 'doom-one t)
-(set-face-attribute 'highlight nil
-		    :foreground 'unspecified
-		    :distant-foreground 'unspecified
-		    :background 'unspecified)
+;; (load-theme 'doom-one t)
+;; (set-face-attribute 'highlight nil
+;; 		    :foreground 'unspecified
+;; 		    :distant-foreground 'unspecified
+;; 		    :background 'unspecified)
+
 ;;(doom-themes-enable-bold)
 ;;(doom-themes-enable-italic)
 #+end_src
@@ -1647,8 +1944,9 @@ truncates text if needed.  Minimal width can be set with
             (face-attribute 'default :background)))
       (fg (face-attribute 'default :foreground))
       (base (face-attribute 'mode-line :background))
-      (box-width (/ (line-pixel-height) 2)))
-  (set-face-attribute 'tab-line nil :background base :foreground fg :height 1.0 :inherit nil :box (list :line-width -1 :color base))
+      ;;(box-width (/ (line-pixel-height) 2)))
+      (box-width (/ 2 2))) ;; line-pixel-height sometimes fails
+  (set-face-attribute 'tab-line nil  :background base :foreground fg :height 1.0 :inherit nil :box (list :line-width -1 :color base))
   (set-face-attribute 'tab-line-tab nil :foreground fg :background bg :weight 'normal :inherit nil :box (list :line-width box-width :color bg))
   (set-face-attribute 'tab-line-tab-inactive nil :foreground fg :background base :weight 'normal :inherit nil :box (list :line-width box-width :color base))
   (set-face-attribute 'tab-line-tab-current nil :foreground fg :background bg :weight 'normal :inherit nil :box (list :line-width box-width :color bg)))
@@ -1748,7 +2046,8 @@ https://crowding.github.io/blog/2014/08/16/replace-less-with-emacs/
   (aorst/treemacs-setup-title)
   (aorst/after-treemacs-setup)
   (aorst/treemacs-setup-fringes)))
-(add-hook 'org-mode-hook (treemacs))
+;; treemacs has recently stopped working after a recent emacs update, possibly in conjunction with installing sidebar.el
+;;(add-hook 'org-mode-hook (treemacs))
 #+end_src
 
 * Continue here
@@ -1831,145 +2130,3 @@ https://crowding.github.io/blog/2014/08/16/replace-less-with-emacs/
 (add-hook 'prog-mode-hook 'nlinum-mode)
 (add-hook 'prog-mode-hook 'visual-line-mode)
 (require 'pcmpl-args)
-
-* Fixing jedi and jupyter
-
-** jedi-core.el
-
-In jedi-core.el
-https://github.com/tkf/emacs-jedi/pull/350
-
-*** jedi:-buffer-file-name
-
-Should look like this so you can get completions from org-babel source buffers:
-
-#+begin_src text
-(defun jedi:-buffer-file-name ()
-  "Return `buffer-file-name' without text properties.
-See: https://github.com/tkf/emacs-jedi/issues/54"
-  (substring-no-properties (or (if (string-match "\*Org Src" (buffer-name (current-buffer)))
-                                   (buffer-file-name (org-src-source-buffer))
-                                 (buffer-file-name))
-                               "")))
-#+end_src
-
-*** jedi:call-deferred
-
-Specifically in jedi:call-deferred this part should be removed:
-
-#+begin_src: text
-  (let ((source      (buffer-substring-no-properties (point-min) (point-max)))
-        (source-path (jedi:-buffer-file-name))
-        ;; line=0 is an error for jedi, but is possible for empty buffers.
-        (line        (max 1 (count-lines (point-min) (min (1+ (point)) (point-max)))))
-        (column      (- (point) (line-beginning-position))))
-    (epc:call-deferred (jedi:get-epc)
-                       method-name
-                       (list source line column source-path))))
-#+end_src
-
-and replaced with:
-
-#+begin_src text
- (with-current-buffer (if (string-match "\*Org Src" (buffer-name (current-buffer)))
-                           (org-src-source-buffer)
-                         (current-buffer))
-    (let ((source      (buffer-substring-no-properties (point-min) (point-max)))
-          ;; line=0 is an error for jedi, but is possible for empty buffers.
-          (line        (max 1 (count-lines (point-min) (min (1+ (point)) (point-max)))))
-          (column      (- (point) (line-beginning-position)))
-          (source-path (jedi:-buffer-file-name)))
-      (epc:call-deferred (jedi:get-epc)
-                         method-name
-                         (list source line column source-path)))))
-#+end_src
-
-** ob-jupyter.el
-
-In ob-jupyter.el:
-
-;; When editing source-blocks and hitting <return>, a new
-;; source-buffer will be opened and block the editing in the current
-;; org-buffer, without switching over to the new buffer. To fix this, we
-;; can define:
-
-#+begin_src: text
-(defun org-babel-edit-prep:jupyter-python (info)
-  "Prepare the edit buffer according to INFO.
-Enable `jupyter-repl-interaction-mode' in the edit buffer
-associated with the session found in INFO.
-
-If the session is a Jupyter TRAMP file name, the
-`default-directory' of the edit buffer is set to the root
-directory the notebook serves."
-  (let* ((params (nth 2 info))
-         (session (alist-get :session params))
-         (client-buffer (org-babel-jupyter-initiate-session session params)))
-    (jupyter-repl-associate-buffer client-buffer)
-    (when (jupyter-tramp-file-name-p session)
-      (setq default-directory (concat (file-remote-p session) "/")))))
-
-
-;; When using (org-babel-jupyter-override-src-block "python") we need
-;; this function to be defined because it won't find the above one:
-(defun org-babel-execute:jupyter-python (body params)
-  "Execute BODY according to PARAMS.
-BODY is the code to execute for the current Jupyter `:session' in
-the PARAMS alist."
-  (let ((result-params (assq :result-params params))
-        (async-p (or (equal (alist-get :async params) "yes")
-                     (plist-member params :async))))
-    (when (member "replace" result-params)
-      (org-babel-jupyter-cleanup-file-links))
-    (let* ((org-babel-jupyter-current-src-block-params params)
-           (session (alist-get :session params))
-           (buf (org-babel-jupyter-initiate-session session params))
-           (jupyter-current-client (buffer-local-value 'jupyter-current-client buf))
-           (lang (jupyter-kernel-language jupyter-current-client))
-           (vars (org-babel-variable-assignments:jupyter params lang))
-           (code (progn
-                   (when-let* ((dir (alist-get :dir params)))
-                     ;; `default-directory' is already set according
-                     ;; to :dir when executing a source block.  Set
-                     ;; :dir to the absolute path so that
-                     ;; `org-babel-expand-body:jupyter' does not try
-                     ;; to re-expand the path. See #302.
-                     (setf (alist-get :dir params) default-directory))
-                   (org-babel-expand-body:jupyter body params vars lang))))
-      (pcase-let ((`(,req ,maybe-result)
-                   (org-babel-jupyter--execute code async-p)))
-        ;; KLUDGE: Remove the file result-parameter so that
-        ;; `org-babel-insert-result' doesn't attempt to handle it while
-        ;; async results are pending.  Do the same in the synchronous
-        ;; case, but not if link or graphics are also result-parameters,
-        ;; only in Org >= 9.2, since those in combination with file mean
-        ;; to interpret the result as a file link, a useful meaning that
-        ;; doesn't interfere with Jupyter style result insertion.
-        ;;
-        ;; Do this after sending the request since
-        ;; `jupyter-generate-request' still needs access to the :file
-        ;; parameter.
-        (when (and (member "file" result-params)
-                   (or async-p
-                       (not (or (member "link" result-params)
-                                (member "graphics" result-params)))))
-          (org-babel-jupyter--remove-file-param params))
-        (prog1 maybe-result
-          ;; KLUDGE: Add the "raw" result parameter for non-inline
-          ;; synchronous results because an Org formatted string is
-          ;; already returned in that case and
-          ;; `org-babel-insert-result' should not process it.
-          (unless (or async-p
-                      (jupyter-org-request-inline-block-p req))
-            (nconc (alist-get :result-params params) (list "raw"))))))))
-#+end_src
-
-emacs-deferred is buggy - find all guix packages emacs-* using that adds emacs-deferred by using guix graph <pkg> and remove them. Then install the following packages at minimum:
-
-emacs            	28.1   	out	/gnu/store/w0ssipd06il3kvyvqihpmw4lwbhwwfq3-emacs-28.1
-python-virtualenv	20.3.1 	out	/gnu/store/40c42833x4wsddchwpxhilzp9v26h8m7-python-virtualenv-20.3.1
-jupyter          	1.0.0  	out	/gnu/store/gl7fw3r3j9q5wwvv286zrmkffriyq5lw-jupyter-1.0.0
-python-wrapper   	3.9.9  	out	/gnu/store/1m48ama708vh9cjn79yw6cj8sgg7pa1b-python-wrapper-3.9.9
-emacs-zmq        	0.10.10	out	/gnu/store/x923id4s5xcs7dyarl7gzjam48q96sfq-emacs-zmq-0.10.10
-python-netaddr   	0.8.0  	out	/gnu/store/d5h40v3az2l27vv141psd2agvsc6fbi6-python-netaddr-0.8.0
-
