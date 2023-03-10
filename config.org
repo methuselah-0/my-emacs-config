@@ -248,15 +248,49 @@ emacs-webkit requires at least Emacs 28
 course webkitgtk installed. Then just run make to make
 webkit-module.so."
 
-#+emacs-lisp
+#+begin_src emacs-lisp
 (add-to-list 'load-path "/home/user1/src/my-emacs-config/emacs-webkit")
-(module-load "/home/user1/src/my-emacs-config/emacs-webkit/webkit-module.so")
+;;(module-load "/home/user1/src/my-emacs-config/emacs-webkit/webkit-module.so")
 (require 'webkit)
-(global-set-key (kbd "s-b") 'webkit) ;; Bind to whatever global key binding you want if you want
+;;(global-set-key (kbd "s-b") 'webkit) ;; Bind to whatever global key binding you want if you want
 (require 'webkit-ace) ;; If you want link hinting
 (require 'webkit-dark) ;; If you want to use the simple dark mode
-#+end_src
+;; Force webkit to always open a new session instead of reusing a current one
+(setq webkit-browse-url-force-new t)
+;; Override the "loading:" mode line indicator with an icon from `all-the-icons.el'
+;; You could also use a unicode icon like ↺
+(defun webkit--display-progress (progress)
+  (setq webkit--progress-formatted
+        (if (equal progress 100.0)
+            ""
+          (format "%s%.0f%%  " (all-the-icons-faicon "spinner") progress)))
+  (force-mode-line-update))
+;; Set action to be taken on a download request. Predefined actions are
+;; `webkit-download-default', `webkit-download-save', and `webkit-download-open'
+;; where the save function saves to the download directory, the open function
+;; opens in a temp buffer and the default function interactively prompts.
+(setq webkit-download-action-alist '(("\\.pdf\\'" . webkit-download-open)
+                                     ("\\.png\\'" . webkit-download-save)
+                                     (".*" . webkit-download-default)))
+;; Globally use the simple dark mode
+;;(setq webkit-dark-mode t)
+;; Globally use a proxy
+;;(add-hook 'webkit-new-hook (lambda () (webkit-set-proxy "socks://localhost:8000")))
+;; If you don't care so much about privacy and want to give your data to google
+;;(setq webkit-search-prefix "https://google.com/search?q=")
 
+;; Specify a different set of characters use in the link hints
+;; For example the following are more convienent if you use dvorak
+;;(setq webkit-ace-chars "aoeuidhtns")
+
+;; If you want history saved in a different place or
+;; Set to `nil' to if you don't want history saved to file (will stay in memory)
+;;(setq webkit-history-file "~/path/to/webkit-history")
+
+;; If you want cookies saved in a different place or
+;; Set to `nil' to if you don't want cookies saved
+;;(setq webkit-cookie-file "~/path/to/cookies")
+#+end_src
 
 ;(load "webkit.el")
 
