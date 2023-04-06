@@ -107,16 +107,39 @@ link]].
 #+END_SRC
 
 
-* Layout, startup etc.
+* Sessions, navigation, scrolling, resizing, startup etc.
+
+Session with desktop-save-mode:
+
+#+begin_src emacs-lisp
+(desktop-save-mode 1)
+#+end_src
+
+Open up last session with =desktop-read= and select session directory.
 
 Windmove let's you move window frames with SHIFT+<arrow-key>
 
 #+begin_src emacs-lisp
 (windmove-default-keybindings)
-;; (global-set-key [(meta shift j)]  'windmove-left)
-;; (global-set-key [(meta shift l)]  'windmove-right)
-;; (global-set-key [(meta shift i)]  'windmove-up)
-;; (global-set-key [(meta shift k)]  'windmove-down)
+(global-set-key [(meta shift j)]  'shrink-window-horizontally)
+(global-set-key [(meta shift l)]  'enlarge-window-horizontally)
+(global-set-key [(meta shift i)]  'enlarge-window)
+(global-set-key [(meta shift k)]  'shrink-window)
+(setq mouse-wheel-tilt-scroll t)
+(defun my-horizontal-recenter ()
+  "make the point horizontally centered in the window"
+  (interactive)
+  (let ((mid (/ (window-width) 2))
+        (line-len (save-excursion (end-of-line) (current-column)))
+        (cur (current-column)))
+    (if (< mid cur)
+        (set-window-hscroll (selected-window)
+                            (- cur mid)))))
+(global-set-key (kbd "C-S-l") 'my-horizontal-recenter)
+;; (global-set-key (kbd "C-x C-<left>") 'shrink-window-horizontally)
+;; (global-set-key (kbd "C-x C-<right>") 'enlarge-window-horizontally)
+;; (global-set-key (kbd "C-x C-<down>") 'shrink-window)
+;; (global-set-key (kbd "C-x C-<up>") 'enlarge-window)
 (global-set-key (kbd "M-<left>") 'windmove-left)
 (global-set-key (kbd "M-<right>") 'windmove-right)
 (global-set-key (kbd "M-<up>") 'windmove-up)
@@ -166,13 +189,8 @@ This only works in GUI mode
 (setq inhibit-startup-screen t
       ;;initial-buffer-choice nil
 )
-
 (put 'upcase-region 'disabled nil)
 (setq org-support-shift-select t)
-(global-set-key (kbd "C-x C-<left>") 'shrink-window-horizontally)
-(global-set-key (kbd "C-x C-<right>") 'enlarge-window-horizontally)
-(global-set-key (kbd "C-x C-<down>") 'shrink-window)
-(global-set-key (kbd "C-x C-<up>") 'enlarge-window)
 #+END_SRC
 
 Disable the menubar with menu-bar-mode 0. Menu bar is the File, Edit,
