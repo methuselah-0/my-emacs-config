@@ -120,7 +120,7 @@ Open up last session with =desktop-read= and select session directory.
 Windmove let's you move window frames with SHIFT+<arrow-key>
 
 #+begin_src emacs-lisp
-(windmove-default-keybindings)
+;;(windmove-default-keybindings)
 (global-set-key [(meta shift j)]  'shrink-window-horizontally)
 (global-set-key [(meta shift l)]  'enlarge-window-horizontally)
 (global-set-key [(meta shift i)]  'enlarge-window)
@@ -140,10 +140,14 @@ Windmove let's you move window frames with SHIFT+<arrow-key>
 ;; (global-set-key (kbd "C-x C-<right>") 'enlarge-window-horizontally)
 ;; (global-set-key (kbd "C-x C-<down>") 'shrink-window)
 ;; (global-set-key (kbd "C-x C-<up>") 'enlarge-window)
-(global-set-key (kbd "M-<left>") 'windmove-left)
-(global-set-key (kbd "M-<right>") 'windmove-right)
-(global-set-key (kbd "M-<up>") 'windmove-up)
-(global-set-key (kbd "M-<down>") 'windmove-down)
+;; (global-set-key (kbd "M-<left>") 'windmove-left)
+;; (global-set-key (kbd "M-<right>") 'windmove-right)
+;; (global-set-key (kbd "M-<up>") 'windmove-up)
+;; (global-set-key (kbd "M-<down>") 'windmove-down)
+(global-set-key (kbd "H-s-a") 'windmove-left)
+(global-set-key (kbd "H-s-d") 'windmove-right)
+(global-set-key (kbd "H-s-w") 'windmove-up)
+(global-set-key (kbd "H-s-s") 'windmove-down)
 #+end_src
 
 Set terminus font (see [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Fonts.html][manual page]]).
@@ -175,7 +179,7 @@ Use sidebar.el
 (add-to-list 'load-path "~/.local/share/icons-in-terminal/")
 (add-to-list 'load-path "~/src/sidebar.el")
 (require 'sidebar)
-(global-set-key (kbd "C-x C-f") 'sidebar-open)
+(global-set-key (kbd "C-x C-v") 'sidebar-open)
 (global-set-key (kbd "C-x C-a") 'sidebar-buffers-open)
 ;;(require 'icons-in-terminal)
 #+END_SRC
@@ -267,29 +271,29 @@ course webkitgtk installed. Then just run make to make
 webkit-module.so."
 
 #+begin_src emacs-lisp
-(add-to-list 'load-path "/home/user1/src/my-emacs-config/emacs-webkit")
-;;(module-load "/home/user1/src/my-emacs-config/emacs-webkit/webkit-module.so")
-(require 'webkit)
+(add-to-list 'load-path (concat (getenv "HOME") "/src/my-emacs-config/emacs-webkit"))
+;;(module-load (concat (getenv "HOME") "/src/my-emacs-config/emacs-webkit/webkit-module.so"))
+;;(require 'webkit)
 ;;(global-set-key (kbd "s-b") 'webkit) ;; Bind to whatever global key binding you want if you want
-(require 'webkit-ace) ;; If you want link hinting
-(require 'webkit-dark) ;; If you want to use the simple dark mode
+;;(require 'webkit-ace) ;; If you want link hinting
+;;(require 'webkit-dark) ;; If you want to use the simple dark mode
 ;; Force webkit to always open a new session instead of reusing a current one
-(setq webkit-browse-url-force-new t)
+;;(setq webkit-browse-url-force-new t)
 ;; Override the "loading:" mode line indicator with an icon from `all-the-icons.el'
 ;; You could also use a unicode icon like ↺
-(defun webkit--display-progress (progress)
-  (setq webkit--progress-formatted
-        (if (equal progress 100.0)
-            ""
-          (format "%s%.0f%%  " (all-the-icons-faicon "spinner") progress)))
-  (force-mode-line-update))
+;;(defun webkit--display-progress (progress)
+;;  (setq webkit--progress-formatted
+;;        (if (equal progress 100.0)
+;;            ""
+;;          (format "%s%.0f%%  " (all-the-icons-faicon "spinner") progress)))
+;;  (force-mode-line-update))
 ;; Set action to be taken on a download request. Predefined actions are
 ;; `webkit-download-default', `webkit-download-save', and `webkit-download-open'
 ;; where the save function saves to the download directory, the open function
 ;; opens in a temp buffer and the default function interactively prompts.
-(setq webkit-download-action-alist '(("\\.pdf\\'" . webkit-download-open)
-                                     ("\\.png\\'" . webkit-download-save)
-                                     (".*" . webkit-download-default)))
+;;(setq webkit-download-action-alist '(("\\.pdf\\'" . webkit-download-open)
+;;                                     ("\\.png\\'" . webkit-download-save)
+;;                                     (".*" . webkit-download-default)))
 ;; Globally use the simple dark mode
 ;;(setq webkit-dark-mode t)
 ;; Globally use a proxy
@@ -356,16 +360,25 @@ webkit-module.so."
 #+end_src
 
 ** general
+*** diff-hl-mode
 
-remember you can use ~M-x list-flycheck-errors~ to get the errors
-described in the minibuffer in case you have the
-flycheck-indication-mode set to left-margin and that conflicts with
-diff-hl-margin-mode's error indication in the same place.
+diff-hl-mode highlights code changes in the margin based on git:
+  - additions with green color
+  - changes in blue
+  - removals in red
+
+If you use flycheck, remember that you can use ~M-x
+list-flycheck-errors~ to get the errors described in the minibuffer in
+case you have the flycheck-indication-mode set to left-margin and that
+conflicts with diff-hl-margin-mode's error indication in the same
+place.
 
 #+begin_src emacs-lisp
 (global-diff-hl-mode)
 (diff-hl-margin-mode)
 #+end_src
+
+*** browse at remote
 
 browse-at-remote lets you open-in-a-browser the file that is open in
 the buffer at the same line number you are currently at - occasionally
@@ -376,6 +389,18 @@ cloned the repo locally.
 #+begin_src emacs-lisp
 (require 'browse-at-remote)
 (global-set-key (kbd "C-c g g") 'browse-at-remote)
+#+end_src
+
+*** magit
+
+#+begin_src emacs-lisp
+;;(require 'magit-org-todos) ;; conflicts with magit-todos-mode
+(magit-todos-mode)
+;; (magit-add-section-hook
+;; 'magit-status-sections-hook
+;; 'magit-org-todos-insert-org-todos
+;; 'magit-insert-staged-changes
+;; t)
 #+end_src
 
 ** Geiser
@@ -618,14 +643,14 @@ interpreted by the kernel you get the python kernel information about
 it, such as signature, docstring, file and type.
 
 #+begin_src emacs-lisp
-(setq ob-ipython-command "/home/user1/.guix-profile/bin/jupyter")
+;;(setq ob-ipython-command "/home/user1/.guix-profile/bin/jupyter")
+(setq ob-ipython-command (concat (getenv "HOME") "/.guix-profile/bin/jupyter"))
 ;;(require 'company-jupyter)
 ;;(require 'company-jedi)
 ;;(require 'ob-ipython)
 ;;(add-to-list 'company-backends 'company-jupyter)
 ;;(add-to-list 'company-backends 'company-ob-ipython)
 #+end_src
-
 
 https://github.com/tmurph/jupyter-mode
 
@@ -657,12 +682,6 @@ Instead try ein:
 #+end_src
 
 or try ob-ipython
-
-*** org-export to confluence wiki markup
-
-#+begin_src emacs-lisp
-(require 'ox-confluence-en)
-#+end_src
 
 *** org-export to ipynb: ox-ipynb
 
@@ -847,6 +866,7 @@ completions() to complete(): should look like: **self.kwargs).complete()
 
 #+begin_src emacs-lisp
 ;;(setq jedi:server-command '("/home/user1/.emacs.d/elpa/jedi-core-20210503.1315/jediepcserver.py"))
+;;(setq jedi:server-command `(,(concat (getenv "HOME") "/.emacs.d/elpa/jedi-core-20210503.1315/jediepcserver.py")))
 (setq jedi:server-args
        '("--log-traceback" "--log=/tmp/pyepc.log"
 ))
@@ -857,19 +877,12 @@ completions() to complete(): should look like: **self.kwargs).complete()
 (add-hook 'jedi-mode-hook 'jedi-direx:setup)
 #+end_src
 
-Also start jedi-mode when in org-mode files. Create a hook to restore
-the org-time-stamp binding of ~C-c .~.
+Don't start jedi-mode automatically when in org-mode files. Create a
+hook to restore the org-time-stamp binding of ~C-c .~.
 
 #+begin_src emacs-lisp
 ;;(add-hook 'org-mode-hook 'my-jedi-server-setup)
-(add-hook 'org-mode-hook 'jedi:setup)
-;;(require 'magit-org-todos) ;; conflicts with magit-todos-mode
-(magit-todos-mode)
-;; (magit-add-section-hook
-;; 'magit-status-sections-hook
-;; 'magit-org-todos-insert-org-todos
-;; 'magit-insert-staged-changes
-;; t)
+;;(add-hook 'org-mode-hook 'jedi:setup)
 (define-key org-mode-map (kbd "C-c d") 'completion-help-at-point)
 ;;(add-hook 'python-mode-hook '(lambda () (define-key python-mode-map (kbd "C-c d") 'jedi:goto-definition )))
 ;;(add-hook 'python-mode-hook '(lambda () (define-key python-mode-map (kbd "C-c d") 'completion-help-at-point )))
@@ -892,6 +905,7 @@ the org-time-stamp binding of ~C-c .~.
 ;;(add-hook 'python-mode-hook 'my-jedi-server-setup)
 
 ;; (setq jedi:server-args
+;;        `("--sys-path" ,(concat (getenv "HOME") "/src/code_python/ipstocidrdir")))
 ;;        '("--sys-path" "/home/user1/src/code_python/ipstocidrdir"))
 ;; (defun my-jedi-server-setup ()
 ;;   (let* ((filedir
@@ -1371,11 +1385,24 @@ Org-mode archive - function/command to archive done tasks in a subtree
 Org-mode alert
 
 #+BEGIN_SRC emacs-lisp
+;; (require 'alert)
 (require 'org-alert)
 (setq org-alert-enable t)
+;;(alert "This is an alert" :severity 'high)
 (setq alert-default-style 'libnotify)
-(setq org-alert-interval 300)
-(setq alert-fade-time 150)
+(setq org-alert-interval 300
+      org-alert-notify-cutoff 15
+      org-alert-notify-after-event-cutoff 5)
+(setq alert-fade-time 180)
+(setq org-alert-time-match-string "\\(?:SCHEDULED\\|DEADLINE\\):.*?<.*?\\([0-9]\\{2\\}:[0-9]\\{2\\}\\).*>")
+;; made it work by: not enabling this during startup, then
+;; (require 'org-alert)
+;; (alert "This is an alert" :severity 'high) ;; does not work
+;; (shell-command "notify-send -t 10000 apa") ;; works!
+;; (setq alert-default-style 'libnotify) ;; works to change and then
+;; (alert "This is an alert" :severity 'high) ;; now this works!
+;; but org-alert-check still doesnt work
+
 #+END_SRC
 
 ** Calendar
@@ -1458,7 +1485,9 @@ Clock in with =C-c C-x C-i= and clock out with =C-c C-x C-o=.
    (ein . t)
    (dot . t)
    (latex . t)
+   (sql . t)
    (shell . t)
+   (scheme . t)
    ;;(ipython . t)
    (jupyter . t)))
 (setq org-confirm-babel-evaluate nil)
@@ -1584,6 +1613,25 @@ the page is displayed-what you want.
 ;; (add-to-list 'org-structure-template-alist
 ;; 	     '("h" "#+BEGIN_HTML\n?\n#+END_HTML"))
 #+END_SRC
+
+** Exporting
+
+*** org-export to tex info manuals
+
+Useful for creating info manuals via org-documents, such as when
+writing literate programs in org-babel.
+
+#+begin_src emacs-lisp
+(require 'ox-texinfo)
+#+end_src
+
+*** org-export to confluence wiki markup
+
+#+begin_src emacs-lisp
+(require 'ox-confluence-en)
+#+end_src
+
+
 
 ** Tangling & Misc
 
