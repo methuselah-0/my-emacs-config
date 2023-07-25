@@ -74,7 +74,29 @@
  '(pdf-view-midnight-colors '("#b2b2b2" . "#292b2e"))
  '(python-indent-guess-indent-offset-verbose nil)
  '(safe-local-variable-values
-   '((eval progn
+   '((eval when
+	   (locate-library "rainbow-mode")
+	   (require 'rainbow-mode)
+	   (rainbow-mode))
+     (org-babel-noweb-wrap-end . &ldquo)
+     (org-babel-noweb-wrap-start . &ldquo)
+     (eval let
+	   ((root-dir-unexpanded
+	     (locate-dominating-file default-directory ".dir-locals.el")))
+	   (when root-dir-unexpanded
+	     (let*
+		 ((root-dir
+		   (file-local-name
+		    (expand-file-name root-dir-unexpanded)))
+		  (root-dir*
+		   (directory-file-name root-dir)))
+	       (unless
+		   (boundp 'geiser-guile-load-path)
+		 (defvar geiser-guile-load-path 'nil))
+	       (make-local-variable 'geiser-guile-load-path)
+	       (require 'cl-lib)
+	       (cl-pushnew root-dir* geiser-guile-load-path :test #'string-equal))))
+     (eval progn
 	   (require 'lisp-mode)
 	   (defun emacs27-lisp-fill-paragraph
 	       (&optional justify)

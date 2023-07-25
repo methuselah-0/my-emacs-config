@@ -144,10 +144,10 @@ Windmove let's you move window frames with SHIFT+<arrow-key>
 ;; (global-set-key (kbd "M-<right>") 'windmove-right)
 ;; (global-set-key (kbd "M-<up>") 'windmove-up)
 ;; (global-set-key (kbd "M-<down>") 'windmove-down)
-(global-set-key (kbd "H-s-b") 'windmove-left)
-(global-set-key (kbd "H-s-m") 'windmove-right)
-(global-set-key (kbd "H-s-h") 'windmove-up)(
-global-set-key (kbd "H-s-n") 'windmove-down)
+(global-set-key (kbd "C-H-s-j") 'windmove-left)
+(global-set-key (kbd "C-H-s-l") 'windmove-right)
+(global-set-key (kbd "C-H-s-i") 'windmove-up)
+(global-set-key (kbd "C-H-s-k") 'windmove-down)
 #+end_src
 
 Set terminus font (see [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Fonts.html][manual page]]).
