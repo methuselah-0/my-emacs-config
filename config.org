@@ -712,7 +712,7 @@ Here we set flake8 and pylint as the only checkers.
 ;;(defvar flycheck-pycheckers-command
 ;;  (executable-find (concat (file-name-directory (or load-file-name buffer-file-name))
 ;;                           "bin/pycheckers")))
-;;(with-eval-after-load 'flycheck (add-hook 'flycheck-mode-hook #'flycheck-pycheckers-setup))
+(with-eval-after-load 'flycheck (add-hook 'flycheck-mode-hook #'flycheck-pycheckers-setup))
 (setq flycheck-pycheckers-checkers '(flake8 pylint))
 #+end_src
 
