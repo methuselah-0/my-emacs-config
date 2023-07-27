@@ -693,10 +693,19 @@ And export to jupyter:
 
 *** flycheck-python-pyflakes and eldoc
 
+Note that if you are on Guix, your python-pylint package may fail with
+an error regarding a missing python-toml package, so install that if
+needed.
+
 You must go to your project directory and run ~pylint
 --generate-rcfile > .pylintrc~, then fix the ~init-hook~ line like
 this: ~init-hook='import sys; sys.path.append("<path to folder your
-module is in>")'~
+module is in>")'~, or set PYTHONPATH="${GUIX_PYTHONPATH}" when
+starting emacs.
+
+A good [[https://inventwithpython.com/blog/2022/11/19/python-linter-comparison-2022-pylint-vs-pyflakes-vs-flake8-vs-autopep8-vs-bandit-vs-prospector-vs-pylama-vs-pyroma-vs-black-vs-mypy-vs-radon-vs-mccabe/][blog post]] explaining and discussing python code checkers.
+
+Here we set flake8 and pylint as the only checkers.
 
 #+begin_src emacs-lisp
 ;;(global-flycheck-mode 1)
@@ -704,6 +713,7 @@ module is in>")'~
 ;;  (executable-find (concat (file-name-directory (or load-file-name buffer-file-name))
 ;;                           "bin/pycheckers")))
 ;;(with-eval-after-load 'flycheck (add-hook 'flycheck-mode-hook #'flycheck-pycheckers-setup))
+(setq flycheck-pycheckers-checkers '(flake8 pylint))
 #+end_src
 
 **** old flymake related setup
@@ -855,6 +865,10 @@ Requires to install rope-read-mode from melpa.
 Note that you can run =M-x jedi:setup= in a regular org-buffer to
 enable jedi autocompletion.
 
+Note that if you are on Guix, you may want to run export
+PYTHONPATH="${GUIX_PYTHONPATH}" to enable jedi to pick up guix
+installed python packages.
+
 You can't use --sys-path <file-dir> to jedi-mode startup any more,
 this is deprecated from the jedi api Script class. Maybe worked
 earlier. Instead make your python code into a package by for example,
@@ -870,7 +884,10 @@ completions() to complete(): should look like: **self.kwargs).complete()
 (setq jedi:server-args
        '("--log-traceback" "--log=/tmp/pyepc.log"
 ))
-;;(setq jedi:complete-on-dot t)                 ; optional
+(setq jedi:complete-on-dot t)                 ; optional
+(defun my-ac-python-mode ()
+  (setq ac-sources '(ac-source-jedi-direct)))
+(add-hook 'jedi-mode-hook 'my-ac-python-mode)
 (add-hook 'python-mode-hook 'jedi:setup)
 (eval-after-load "python"
   '(define-key python-mode-map "\C-cx" 'jedi-direx:pop-to-buffer))
