@@ -599,7 +599,7 @@ the terminals it looks weird, and also not that important because
 auto-indentation exists, etc.
 
 #+begin_src emacs-lisp
-(elpy-enable)
+;;(elpy-enable) ;; do not auto-enable because using auto-complete and jedi instead
 (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
 (setq elpy-modules (delq 'elpy-module-highlight-indentation elpy-modules))
 (add-hook 'elpy-mode-hook (lambda ()
