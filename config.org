@@ -1429,6 +1429,13 @@ Org-mode alert
     (load-file "~/.emacs.d/caldav-conf.el"))
 #+END_SRC
 
+For displaying stuff:
+
+#+BEGIN_SRC emacs-lisp
+(require 'calfw)
+(require 'calfw-org)
+#+END_SRC
+
 ** Agenda
 
 Org-Mode agenda
