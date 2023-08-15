@@ -599,7 +599,7 @@ the terminals it looks weird, and also not that important because
 auto-indentation exists, etc.
 
 #+begin_src emacs-lisp
-;;(elpy-enable) ;; do not auto-enable because using auto-complete and jedi instead
+(elpy-enable) ;; do not auto-enable because using auto-complete and jedi instead
 (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
 (setq elpy-modules (delq 'elpy-module-highlight-indentation elpy-modules))
 (add-hook 'elpy-mode-hook (lambda ()
@@ -616,6 +616,7 @@ auto-indentation exists, etc.
         (error (elpy-rgrep-symbol
                    (concat "\\(def\\|class\\)\s" (thing-at-point 'symbol) "(")))))
 (define-key elpy-mode-map (kbd "M-.") 'elpy-goto-definition-or-rgrep)
+(elpy-disable)
 #+end_src
 
 *** auto-complete and quickhelp-time
@@ -1782,6 +1783,23 @@ nice so it doesn't clog up all directories in the filesystem.
 #+END_SRC
 
 * Misc
+
+** find file fuzzy search using fzf
+
+#+begin_src emacs-lisp
+;; credit: yorickvP on Github
+(setq fzf/args "-x --color bw --print-query --margin=1,0 --no-hscroll"
+        fzf/executable "fzf"
+        fzf/git-grep-args "-i --line-number %s"
+        ;; command used for `fzf-grep-*` functions
+        ;; example usage for ripgrep:
+        ;; fzf/grep-command "rg --no-heading -nH"
+        fzf/grep-command "grep -nrH"
+        ;; If nil, the fzf buffer will appear at the top of the window
+        fzf/position-bottom t
+        fzf/window-height 15)
+(global-set-key (kbd "C-x f") 'fzf-find-file)
+#+end_src
 
 ** clipboard
 
