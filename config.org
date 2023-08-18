@@ -2135,7 +2135,7 @@ slides well, so useful when running export-and-open.
 
 #+BEGIN_SRC emacs-lisp
 (setq browse-url-browser-function 'browse-url-generic
-      browse-url-generic-program "chromium")
+      browse-url-generic-program "icecat")
 #+END_SRC
 
 ** Move lines keys
