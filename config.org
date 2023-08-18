@@ -890,9 +890,9 @@ completions() to complete(): should look like: **self.kwargs).complete()
   (setq ac-sources '(ac-source-jedi-direct)))
 (add-hook 'jedi-mode-hook 'my-ac-python-mode)
 (add-hook 'python-mode-hook 'jedi:setup)
-(eval-after-load "python"
-  '(define-key python-mode-map "\C-cx" 'jedi-direx:pop-to-buffer))
-(add-hook 'jedi-mode-hook 'jedi-direx:setup)
+;(eval-after-load "python"
+;  '(define-key python-mode-map "\C-cx" 'jedi-direx:pop-to-buffer))
+;(add-hook 'jedi-mode-hook 'jedi-direx:setup)
 #+end_src
 
 Don't start jedi-mode automatically when in org-mode files. Create a
