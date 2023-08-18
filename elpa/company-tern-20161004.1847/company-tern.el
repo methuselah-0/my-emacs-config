@@ -6,7 +6,7 @@
 ;; URL: https://github.com/proofit404/company-tern
 ;; Package-Version: 20161004.1847
 ;; Version: 0.3.0
-;; Package-Requires: ((company "0.8.0") (tern "0.0.1") (dash "2.8.0") (dash-functional "2.8.0") (s "1.9.0") (cl-lib "0.5.0"))
+;; Package-Requires: ((company "0.9.13") (tern "0.0.1") (dash "2.8.0") (dash-functional "2.8.0") (s "1.9.0") (cl-lib "0.5.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by

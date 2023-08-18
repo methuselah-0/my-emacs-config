@@ -3,7 +3,7 @@
 ;; Copyright (C) 2015 Takafumi Arakaki
 
 ;; Author: Takafumi Arakaki <aka.tkf at gmail.com>
-;; Package-Requires: ((emacs "24") (jedi-core "0.2.2") (auto-complete "1.4"))
+;; Package-Requires: ((emacs "24") (jedi-core "0.2.2") (auto-complete "1.5.1"))
 ;; Package-Version: 20191011.1750
 ;; Package-Commit: 81c5a42b83f3a3c9d062b487f48009def11310f8
 ;; Version: 0.2.8
