@@ -396,6 +396,7 @@ cloned the repo locally.
 #+begin_src emacs-lisp
 ;;(require 'magit-org-todos) ;; conflicts with magit-todos-mode
 (magit-todos-mode)
+(global-set-key (kbd "C-x g") 'magit-status)
 ;; (magit-add-section-hook
 ;; 'magit-status-sections-hook
 ;; 'magit-org-todos-insert-org-todos
