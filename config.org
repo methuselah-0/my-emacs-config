@@ -446,8 +446,12 @@ https://www.emacswiki.org/emacs/ParEdit
 
 ** Python
 *** Jedi with flycheck, pyvenv, pyenv, virtualenv-auto
+After the full procedure below, you may need to logout from your
+console login and back in again, or restart sway for example if you
+are using that - and then start emacs from your sway
+launcher. Otherwise the pythonpath might not be set right.
 
-First install the python-pyenv package on guix. Then:
+To the process: first install the python-pyenv package on guix. Then:
 
 #+begin_src
 echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
@@ -482,7 +486,7 @@ pyenv-virtualenv stuff too. you can install a python version and environment, li
 make sure to install setuptools which installs disttils in your new
 environment:
 
-=pip install setuptools=
+~pip install setuptools pylint-pyenv pyenv flake8==7.0.0 mypy~
 
 *** emacs and project dotfiles
 
