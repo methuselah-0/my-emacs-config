@@ -578,6 +578,18 @@ warn_required_dynamic_aliases = True
 warn_untyped_fields = True
 #+end_src
 
+finally, setup a =.dir-locals.el= file in the project root as well,
+with this content, making sure that the =venv= is recognized by
+flycheck:
+
+#+begin_src text
+((nil . ((pyvenv-activate . "~/.pyenv/versions/3.12.1/envs/venv")
+	 ;;(flycheck-pycheckers-venv-root . "~/.pyenv/versions")
+	 (flycheck-pycheckers-args . "--venv-path=~/.pyenv/versions/3.12.1/envs/venv")
+	 (python-environment-directory . "~/.pyenv/versions")
+	 (python-environment-virtualenv . '("pyenv" "activate" "3.12.1/envs/venv")))))
+#+end_src
+
 now visit your test.py file and start flycheck-mode and
 flycheck-list-errors via =M-x=, and errors should start to show up as
 you type with a small delay.
