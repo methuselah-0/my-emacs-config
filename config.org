@@ -445,6 +445,143 @@ https://www.emacswiki.org/emacs/ParEdit
 #+END_SRC
 
 ** Python
+*** Jedi with flycheck, pyvenv, pyenv, virtualenv-auto
+
+First install the python-pyenv package on guix. Then:
+
+#+begin_src
+echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
+echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
+echo 'eval "$(pyenv init -)"' >> ~/.bashrc
+#+end_src
+
+Then restart the shell
+
+#+begin_src text
+exec "$SHELL"
+#+end_src
+
+Now install pyenv-virtualenv(TODO: to add to pyenv package as second
+origin):
+
+#+begin_src text
+git clone https://github.com/pyenv/pyenv-virtualenv.git $(pyenv root)/plugins/pyenv-virtualenv
+echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.bashrc
+exec "$SHELL"
+#+end_src
+
+after having installed the pyenv mode .bashrc stuff, the
+pyenv-virtualenv stuff too. you can install a python version and environment, like so:
+
+=pyenv install 3.12.1=
+
+=cd myproject; pyenv virtualenv 3.12.1 venv=
+
+=pyenv local 3.12.1/envs/venv=
+
+make sure to install setuptools which installs disttils in your new
+environment:
+
+=pip install setuptools=
+
+*** emacs and project dotfiles
+
+For emacs, make sure to install from melpa (TODO: to package these):
+
+  auto-virtualenv                20240115.1548  installed    Auto activate python virtualenvs
+  pyenv-mode                     20230821.1645  installed    Integrate pyenv with python-mode
+  pyvenv-auto                    20230106.415   installed    Automatically switch Python venvs
+
+Exampel .dir-locals.el file to put in a project directory (modify
+paths as needed):
+
+#+begin_src text
+((nil . ((pyvenv-activate . "~/.pyenv/versions/3.12.1/envs/venv")
+	 ;;(flycheck-pycheckers-venv-root . "~/.pyenv/versions")
+	 (flycheck-pycheckers-args . "--venv-path=~/.pyenv/versions/3.12.1/envs/venv")
+	 (python-environment-directory . "~/.pyenv/versions")
+	 (python-environment-virtualenv . '("pyenv" "activate" "3.12.1/envs/venv")))))
+#+end_src
+
+Then make sure to run =jedi:start-dedicated-server= from a python file
+in the project, so that jedi will take the venv into account.
+
+#+begin_src emacs-lisp
+(require 'auto-virtualenv)
+(add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv)
+(require 'pyvenv-auto)
+#+end_src
+
+You may need to also run =pyenv-mode-set RET 3.12.1/envs/venv= or
+similar, then restart pyenv-mode to ensure it's loaded properly, then
+you can =C-c C-p RET C-c C-c= to start a python-interpreter and
+execute python code from a current python buffer. Make sure to install
+mypy, pylint, pylint-per-file-ignores and flake8==7.0.0 in the venv
+with pip.
+
+Example =cat .pycheckers= output:
+
+#+begin_src text
+[DEFAULT]
+checkers = flake8,pylint,mypy3
+venv_path = /home/user1/.pyenv/versions/3.12.1/envs/venv
+# venv_root = /home/user1/.pyenv/versions
+pylint_rcfile = ci/pylintrc
+flake8_config_file = ci/flake8
+mypy_config_file = ci/mypy.ini
+max_line_length = 88
+#+end_src
+
+example =cat ci/flake8= output:
+
+#+begin_src text
+[flake8]
+# stick to black's default of 88
+max-line-length = 88
+
+per-file-ignores =
+  test.py:E302
+#+end_src
+
+example =cat ci/pylintrc= output:
+
+#+begin_src text
+[MESSAGES CONTROL]
+
+per-file-ignores =
+  somedir/somefile/toignore:invalid-name,missing-fusion-docstring
+#+end_src
+
+note that for =pylintrc=, you can generate the rcfile with =pylint
+--generate-rcfile > ci/pylintrc=.
+
+example =cat ci/mypy.ini= output (setup for pydantic):
+
+#+begin_src text
+[mypy]
+plugins = pydantic.mypy
+
+follow_imports = silent
+warn_redundant_casts = True
+warn_unused_ignores = True
+disallow_any_generics = True
+check_untyped_defs = True
+no_implicit_reexport = True
+
+# for strict mypy: (this is the tricky one :-))
+disallow_untyped_defs = True
+
+[pydantic-mypy]
+init_forbid_extra = True
+init_typed = True
+warn_required_dynamic_aliases = True
+warn_untyped_fields = True
+#+end_src
+
+now visit your test.py file and start flycheck-mode and
+flycheck-list-errors via =M-x=, and errors should start to show up as
+you type with a small delay.
+
 *** Fixing jedi and jupyter
 
 **** jedi-core.el
@@ -712,12 +849,17 @@ A good [[https://inventwithpython.com/blog/2022/11/19/python-linter-comparison-2
 Here we set flake8 and pylint as the only checkers.
 
 #+begin_src emacs-lisp
-;;(global-flycheck-mode 1)
-;;(defvar flycheck-pycheckers-command
-;;  (executable-find (concat (file-name-directory (or load-file-name buffer-file-name))
-;;                           "bin/pycheckers")))
+(load "flycheck-pycheckers.el")
+(global-flycheck-mode 1)
+(defvar flycheck-pycheckers-command
+  (executable-find (concat (file-name-directory (or load-file-name buffer-file-name))
+                           "bin/pycheckers")))
 (with-eval-after-load 'flycheck (add-hook 'flycheck-mode-hook #'flycheck-pycheckers-setup))
 (setq flycheck-pycheckers-checkers '(flake8 pylint))
+(setq flycheck-pycheckers '(flake8 pylint))
+(defvar python-pycheckers
+  (executable-find (concat (file-name-directory (or load-file-name buffer-file-name))
+                           "bin/pycheckers")))
 #+end_src
 
 **** old flymake related setup

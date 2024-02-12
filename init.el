@@ -69,13 +69,20 @@
      ("XXX+" . "#dc752f")
      ("\\?\\?\\?+" . "#dc752f")))
  '(magit-todos-insert-after '(bottom) nil nil "Changed by setter of obsolete option `magit-todos-insert-at'")
+ '(org-agenda-files
+   '("~/VirtualHome/src/ical2org/events.org" "/home/user1/org/work.org" "/home/user1/org/notes.org" "/home/user1/org/home.org" "/home/user1/org/fromhome.org"))
  '(org-re-reveal-script-files '("js/reveal.js"))
  '(package-selected-packages
-   '(sql-indent xref-js2 jedi-direx jedi flymake-python-pyflakes ein rope-read-mode guix flycheck-pycheckers jupyter ob-ipython spacemacs-theme flycheck-pyflakes anaconda-mode ag ox-reveal ox-hugo ox-gfm org-alert syslog-mode nlinum rainbow-delimiters ac-geiser auto-complete-pcmp auto-complete paredit geiser))
+   '(pyvenv-auto auto-virtualenv pyenv-mode sql-indent xref-js2 jedi-direx jedi flymake-python-pyflakes ein rope-read-mode guix flycheck-pycheckers jupyter ob-ipython spacemacs-theme flycheck-pyflakes anaconda-mode ag ox-reveal ox-hugo ox-gfm org-alert syslog-mode nlinum rainbow-delimiters ac-geiser auto-complete-pcmp auto-complete paredit geiser))
  '(pdf-view-midnight-colors '("#b2b2b2" . "#292b2e"))
  '(python-indent-guess-indent-offset-verbose nil)
  '(safe-local-variable-values
-   '((eval add-hook 'before-save-hook 'time-stamp)
+   '((flycheck-pycheckers-venv-root . "~/.pyenv/versions")
+     (python-environment-virtualenv quote
+				    ("pyenv" "activate" "3.12.1/envs/venv"))
+     (python-environment-directory . "~/.pyenv/versions")
+     (geiser-repl-per-project-p . t)
+     (eval add-hook 'before-save-hook 'time-stamp)
      (eval when
 	   (locate-library "rainbow-mode")
 	   (require 'rainbow-mode)
