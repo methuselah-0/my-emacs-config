@@ -353,6 +353,41 @@ webkit-module.so."
 #+END_SRC
 
 * Programming
+** docker
+
+https://github.com/spotify/dockerfile-mode
+
+
+A Dockerfile mode for emacs
+
+#+begin_src emacs-lisp
+;;(add-to-list 'load-path "/your/path/to/dockerfile-mode/")
+(require 'dockerfile-mode)
+#+end_src
+
+Adds syntax highlighting as well as the ability to build the image
+directly using `C-c C-b` from the buffer (`C-c M-b` to bypass docker build cache).
+
+You can specify the image name in the file itself by adding a line like this
+at the top of your Dockerfile.
+
+#+begin_src text
+## -*- dockerfile-image-name: "your-image-name-here" -*-
+#+end_src
+
+If you don't, you'll be prompted for an image name each time you build.
+You may want to add the following to your emacs config:
+
+#+begin_src emacs-lisp
+;;(put 'dockerfile-image-name 'safe-local-variable #'stringp)
+#+end_src
+
+You can change the binary to use with
+
+#+begin_src emacs-lisp
+(setq dockerfile-mode-command "docker")
+#+end_src
+
 ** sql
 
 #+begin_src emacs-lisp
