@@ -7,6 +7,13 @@
     (insert-file-contents filePath)
     (split-string (buffer-string) "\n" t)))
 
+;;(require 'cl-lib)
+(defun filter (regex list)
+  "Return strings in list matching regex"
+  (cl-remove-if-not (lambda (x)
+		      (string-match-p regex x))
+		    list))
+
 (if (file-exists-p "~/.emacs.d/name.txt")
     (let ((a (read-lines "~/.emacs.d/name.txt")))
       (let
