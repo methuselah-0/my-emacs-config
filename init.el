@@ -77,7 +77,32 @@
  '(pdf-view-midnight-colors '("#b2b2b2" . "#292b2e"))
  '(python-indent-guess-indent-offset-verbose nil)
  '(safe-local-variable-values
-   '((flycheck-pycheckers-venv-root . "~/.pyenv/versions")
+   '((eval setq-local dockerfile-build-args
+	   (filter "^[a-zA-Z_]+=.*"
+		   (read-lines
+		    (concat project-path "/.env"))))
+     (eval setq-local project-path
+	   (replace-regexp-in-string "\12$" ""
+				     (shell-command-to-string "git rev-parse --show-toplevel")))
+     (eval setq-local project-path
+	   (shell-command-to-string "git rev-parse --show-toplevel"))
+     (eval setq-local project-path
+	   (buffer-file-name))
+     (project-path buffer-file-name)
+     (eval setq-local dockerfile-build-args
+	   (if
+	       (file-exists-p "./.env.dev")
+	       (append
+		(filter "^[a-zA-Z_]+=.*"
+			(read-lines "./.env"))
+		(filter "^[a-zA-Z_]+=.*"
+			(read-lines "./.env.dev")))
+	     (filter "^[a-zA-Z_]+=.*"
+		     (read-lines "./.env"))))
+     (eval setq-local dockerfile-build-args
+	   (filter "^[a-zA-Z_]+=.*"
+		   (read-lines "./.env")))
+     (flycheck-pycheckers-venv-root . "~/.pyenv/versions")
      (python-environment-virtualenv quote
 				    ("pyenv" "activate" "3.12.1/envs/venv"))
      (python-environment-directory . "~/.pyenv/versions")

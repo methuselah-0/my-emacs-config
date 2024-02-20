@@ -541,7 +541,7 @@ For emacs, make sure to install from melpa (TODO: to package these):
   pyenv-mode                     20230821.1645  installed    Integrate pyenv with python-mode
   pyvenv-auto                    20230106.415   installed    Automatically switch Python venvs
 
-Exampel .dir-locals.el file to put in a project directory (modify
+Example =.dir-locals.el= file to put in a project directory (modify
 paths as needed):
 
 #+begin_src text
@@ -549,6 +549,17 @@ paths as needed):
 	 ;;(flycheck-pycheckers-venv-root . "~/.pyenv/versions")
 	 (flycheck-pycheckers-args . "--venv-path=~/.pyenv/versions/3.12.1/envs/venv")
 	 (python-environment-directory . "~/.pyenv/versions")
+	 (eval . (setq-local project-path
+			     (replace-regexp-in-string "\n$" ""
+						       (shell-command-to-string "git rev-parse --show-toplevel"))))
+	 ;; (eval . (setq-local dockerfile-build-args
+	 ;; 		     (if (file-exists-p "./.env.dev")
+	 ;; 			 (append
+	 ;; 			  (filter "^[a-zA-Z_]+=.*" (read-lines "./.env"))
+	 ;; 			  (filter "^[a-zA-Z_]+=.*" (read-lines "./.env.dev")))
+	 ;; 		       (filter "^[a-zA-Z_]+=.*" (read-lines "./.env")))))
+	 (eval . (setq-local dockerfile-build-args
+			       (filter "^[a-zA-Z_]+=.*" (read-lines (concat project-path "/.env")))))
 	 (python-environment-virtualenv . '("pyenv" "activate" "3.12.1/envs/venv")))))
 #+end_src
 
@@ -630,6 +641,119 @@ warn_untyped_fields = True
 now visit your test.py file and start flycheck-mode and
 flycheck-list-errors via =M-x=, and errors should start to show up as
 you type with a small delay.
+
+*** Jupyter with pyenv
+
+emacs-jupyter is kind of nice, and below setup allows you to easily
+import stuff from your project and create project specific kernels
+that uses the venv defined for the project directory.
+
+Instead of using guix's jupyter 1.0.0, you can combine pip's jupyter
+with emacs-jupyter package. This setup assumes =~/src/project_1,
+~/src/project_2= structure, and some more stuff covered below.
+
+**** some helper elisp
+
+look in elisp-files for the definition:
+
+#+begin_src emacs-lisp
+(load "jupyter-venv-setup.el")
+#+end_src
+
+**** create a jupyter_only venv
+
+Needed for the jupyter commands:
+
+#+begin_src text
+pyenv virtualenv 3.12.1 jupyter_only
+pyenv activate jupyter_only
+pip install jupyter
+pyenv deactivate
+#+end_src
+
+add these to =~/.bashrc=, like
+
+#+begin_src text
+export PATH="$HOME"/.pyenv/versions/jupyter_only/bin:"$PATH"
+export PATH="$HOME"/bin:"$PATH"
+#+end_src
+
+**** jupyter bin
+
+To override the jupyter command with some extras.
+
+If you are on guix, you might need to install =gcc-objc++= to make the
+=libstdc++.so= file available in =~/.guix-profile/lib=. If you did
+that before you compiled your favorite python version you may not need
+the LD_LIBRARY_PATH fixed for jupyter like below.
+
+Add a file =~/bin/jupyter= like:
+
+#+begin_src text
+#!/usr/bin/env bash
+
+# https://github.com/emacs-jupyter/jupyter/issues/446
+PYDEVD_DISABLE_FILE_VALIDATION=1 LD_LIBRARY_PATH=~/.guix-profile/lib /home/user1/.pyenv/versions/jupyter_only/bin/jupyter "$@"
+#+end_src
+
+**** pybin
+
+Just put this in your =~/src/project_name= directory and make it
+executable. Note that you can modify =PYTHONPATH= here to your liking
+depending on project-specific directory setups. The point is to be
+able to load modules from your project directory immediately when you
+spawn the kernel, without needing to copy paste some =sys.path=
+modification code.
+
+#+begin_src text
+#!/usr/bin/env bash
+
+PROJECT_PATH="$(dirname "${BASH_SOURCE[0]}")"
+VENVPATH="$(cd "${PROJECT_PATH}" && pyenv prefix)"
+
+export PYTHONPATH="${PROJECT_PATH}""${PYTHONPATH:+:}""${PYTHONPATH}"
+# https://github.com/emacs-jupyter/jupyter/issues/446
+export PYDEVD_DISABLE_FILE_VALIDATION=1
+# libstdc6++.so
+LD_LIBRARY_PATH=~/.guix-profile/lib "$VENVPATH"/bin/python "$@"
+#+end_src
+
+**** add project-specific kernel
+
+=M-x my-add-jupyter-kernel=
+
+select a directory from =~/src= with auto-completion.
+
+A =kernel.json= file should now have been created in
+=~/.pyenv/versions/jupyter_only/share/jupyter/kernels/<project_name>/kernel.json=
+
+**** refresh available kernels list
+
+If the new kernel is not immediately recognized, you might need to
+restart emacs. You should be able to run
+=(jupyter-available-kernelspecs 'refresh)= but it might fail due to
+env variables not properly setup, so restart instead if needed. Some
+things you can try to avoid restarting are:
+
+run:
+
+=(setenv "LD_LIBRARY_PATH" (expand-file-name "~/.guix-profile/lib"))=
+
+and
+
+=(setenv "PYDEVD_DISABLE_FILE_VALIDATION" "1")=
+
+and
+
+=(jupyter-available-kernelspecs 'refresh)=
+
+but in one eval session perhaps.
+
+**** finalize
+
+now you can go to a git project in =~/src/project_name=, and try =M-x
+jupyter-run-repl RET= and then you can import anything installed in
+that projects venv or modules within the project itself.
 
 *** Fixing jedi and jupyter
 
