@@ -682,7 +682,7 @@ export PATH="$HOME"/bin:"$PATH"
 
 To override the jupyter command with some extras.
 
-If you are on guix, you might need to install =gcc-objc++= to make the
+If you are on guix, you might need to install =gcc-objc++:lib= to make the
 =libstdc++.so= file available in =~/.guix-profile/lib=. If you did
 that before you compiled your favorite python version you may not need
 the LD_LIBRARY_PATH fixed for jupyter like below.
@@ -693,7 +693,7 @@ Add a file =~/bin/jupyter= like:
 #!/usr/bin/env bash
 
 # https://github.com/emacs-jupyter/jupyter/issues/446
-PYDEVD_DISABLE_FILE_VALIDATION=1 LD_LIBRARY_PATH=~/.guix-profile/lib /home/user1/.pyenv/versions/jupyter_only/bin/jupyter "$@"
+PYDEVD_DISABLE_FILE_VALIDATION=1 LD_LIBRARY_PATH=~/.guix-profile/lib ~/.pyenv/versions/jupyter_only/bin/jupyter "$@"
 #+end_src
 
 **** pybin
