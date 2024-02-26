@@ -1,5 +1,7 @@
 * Basic info
 
+Read name and email from =~/.emacs.d/name.txt=.
+
 #+begin_src emacs-lisp
 (defun read-lines (filePath)
   "Return a list of lines of a file at filePath."
@@ -762,6 +764,11 @@ that projects venv or modules within the project itself.
 In jedi-core.el
 https://github.com/tkf/emacs-jedi/pull/350
 
+sometimes you might need to run =pip install --upgrade
+~/.emacs.d/elpa/jedi-core-20210503.13.15= if you get "executable-find:
+Wrong type argument: stringp, quite" errors when trying to re-install
+it.
+
 **** jedi:-buffer-file-name
 
 Should look like this so you can get completions from org-babel source buffers:
@@ -1013,8 +1020,8 @@ needed.
 
 You must go to your project directory and run ~pylint
 --generate-rcfile > .pylintrc~, then fix the ~init-hook~ line like
-this: ~init-hook='import sys; sys.path.append("<path to folder your
-module is in>")'~, or set PYTHONPATH="${GUIX_PYTHONPATH}" when
+this: init-hook='import sys; sys.path.append("<path to folder your
+module is in>"), or set PYTHONPATH="${GUIX_PYTHONPATH}" when
 starting emacs.
 
 A good [[https://inventwithpython.com/blog/2022/11/19/python-linter-comparison-2022-pylint-vs-pyflakes-vs-flake8-vs-autopep8-vs-bandit-vs-prospector-vs-pylama-vs-pyroma-vs-black-vs-mypy-vs-radon-vs-mccabe/][blog post]] explaining and discussing python code checkers.
@@ -1201,16 +1208,18 @@ completions() to complete(): should look like: **self.kwargs).complete()
 ;;(setq jedi:server-command '("/home/user1/.emacs.d/elpa/jedi-core-20210503.1315/jediepcserver.py"))
 ;;(setq jedi:server-command `(,(concat (getenv "HOME") "/.emacs.d/elpa/jedi-core-20210503.1315/jediepcserver.py")))
 (setq jedi:server-args
-       '("--log-traceback" "--log=/tmp/pyepc.log"
-))
+      '("--log-traceback" "--log=/tmp/pyepc.log"
+	))
 (setq jedi:complete-on-dot t)                 ; optional
+(require 'jupyter)
+(define-key jupyter-repl-mode-map (kbd "C-c d") 'completion-help-at-point)
 (defun my-ac-python-mode ()
   (setq ac-sources '(ac-source-jedi-direct)))
 (add-hook 'jedi-mode-hook 'my-ac-python-mode)
 (add-hook 'python-mode-hook 'jedi:setup)
-;(eval-after-load "python"
-;  '(define-key python-mode-map "\C-cx" 'jedi-direx:pop-to-buffer))
-;(add-hook 'jedi-mode-hook 'jedi-direx:setup)
+;;(eval-after-load "python"
+;;  '(define-key python-mode-map "\C-cx" 'jedi-direx:pop-to-buffer))
+;;(add-hook 'jedi-mode-hook 'jedi-direx:setup)
 #+end_src
 
 Don't start jedi-mode automatically when in org-mode files. Create a
@@ -1454,8 +1463,8 @@ back, and ~M-?~ to find references.
 
 You can also use ~M-x RET tern-show-docs~ etc.
 
-U should add export
-=PATH=~/src/my-emacs-config/node_modules/tern/bin:"$PATH"= before
+U should add
+=export PATH=~/src/my-emacs-config/node_modules/tern/bin:"$PATH"= before
 starting emacs, to ensure the tern-server auto-starts when visiting
 .js files.
 
