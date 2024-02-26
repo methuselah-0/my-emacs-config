@@ -551,15 +551,15 @@ paths as needed):
 	 (python-environment-directory . "~/.pyenv/versions")
 	 (eval . (setq-local project-path
 			     (replace-regexp-in-string "\n$" ""
-						       (shell-command-to-string "git rev-parse --show-toplevel"))))
+						       (shell-command-to-string "git rev-parse --show-toplevel || echo ."))))
 	 ;; (eval . (setq-local dockerfile-build-args
 	 ;; 		     (if (file-exists-p "./.env.dev")
 	 ;; 			 (append
 	 ;; 			  (filter "^[a-zA-Z_]+=.*" (read-lines "./.env"))
 	 ;; 			  (filter "^[a-zA-Z_]+=.*" (read-lines "./.env.dev")))
 	 ;; 		       (filter "^[a-zA-Z_]+=.*" (read-lines "./.env")))))
-	 (eval . (setq-local dockerfile-build-args
-			       (filter "^[a-zA-Z_]+=.*" (read-lines (concat project-path "/.env")))))
+	 (eval . (if (file-exists-p (concat project-path "/.env"))
+		     (filter "^[a-zA-Z_]+=.*" (read-lines (concat project-path "/.env")))))
 	 (python-environment-virtualenv . '("pyenv" "activate" "3.12.1/envs/venv")))))
 #+end_src
 
