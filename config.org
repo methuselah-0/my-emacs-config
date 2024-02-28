@@ -561,7 +561,7 @@ paths as needed):
 	 ;; 			  (filter "^[a-zA-Z_]+=.*" (read-lines "./.env.dev")))
 	 ;; 		       (filter "^[a-zA-Z_]+=.*" (read-lines "./.env")))))
 	 (eval . (if (file-exists-p (concat project-path "/.env"))
-		     (filter "^[a-zA-Z_]+=.*" (read-lines (concat project-path "/.env")))))
+		     (setq dockerfile-build-args (filter "^[a-zA-Z_]+=.*" (read-lines (concat project-path "/.env"))))))	 
 	 (python-environment-virtualenv . '("pyenv" "activate" "3.12.1/envs/venv")))))
 #+end_src
 
